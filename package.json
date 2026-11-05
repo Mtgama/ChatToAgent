@@ -1,6 +1,6 @@
 {
   "name": "chat-to-agent",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "ChatToAgent — Persian-first browser MCP tools and a local management companion",
   "license": "MIT",
   "private": true,

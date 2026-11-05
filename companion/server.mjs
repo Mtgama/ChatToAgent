@@ -202,7 +202,7 @@ const server = http.createServer(async (request, response) => {
     }
     if (!authorized(request.headers.authorization, token)) return send(401, { error: 'کلید اتصال معتبر نیست؛ کد اتصال را از پنل محلی دریافت کنید.' });
     if (request.method === 'GET' && url.pathname === '/api/status') return send(200, {
-      version: '0.7.1', running: !!proxy, ready, busy, lastError, startedAt, installed: await installed(),
+      version: '0.7.2', running: !!proxy, ready, busy, lastError, startedAt, installed: await installed(),
       settings, endpoint: `http://127.0.0.1:${proxyPort}/sse`, platform: process.platform,
     });
     if (request.method === 'GET' && url.pathname === '/api/logs') return send(200, { logs: logs.filter(entry => entry.id > Number(url.searchParams.get('since') || 0)), sequence });

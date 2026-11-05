@@ -1,5 +1,5 @@
 import 'webextension-polyfill';
-import './companion';
+import { registerCompanionBridge } from './companion';
 import { exampleThemeStorage } from '@extension/storage';
 import { RemoteConfigManager } from './remote-config-manager';
 import {
@@ -38,6 +38,9 @@ import type {
   HeartbeatResponseBroadcast
 } from '../../../pages/content/src/types/messages';
 import { createLogger } from '@extension/shared/lib/logger';
+
+// Explicit registration keeps the manager bridge in production builds.
+registerCompanionBridge();
 
 // Default MCP server URLs
 

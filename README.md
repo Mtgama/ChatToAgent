@@ -4,11 +4,11 @@
 
 Persian-first Chrome extension and local control panel by **mehrdad hasanzade**, based on [MCP SuperAssistant](https://github.com/srbhptl39/MCP-SuperAssistant), licensed under MIT.
 
-**Version:** 0.7.1 · **Interface:** Persian / RTL · **Documentation:** English & فارسی
+**Version:** 0.7.2 · **Interface:** Persian / RTL · **Documentation:** English & فارسی
 
 [English](#english) · [راهنمای فارسی](#فارسی) · [نسخهٔ مستقل فارسی](README.fa.md)
 
-[![Download Chrome extension v0.7.1](docs/assets/download-extension.svg)](https://github.com/Mtgama/ChatToAgent/releases/download/v0.7.1/ChatToAgent-Chrome-v0.7.1.zip)
+[![Download Chrome extension v0.7.2](docs/assets/download-extension.svg)](https://github.com/Mtgama/ChatToAgent/releases/download/v0.7.2/ChatToAgent-Chrome-v0.7.2.zip)
 
 [All releases / همهٔ نسخه‌ها](https://github.com/Mtgama/ChatToAgent/releases)
 
@@ -53,7 +53,7 @@ ChatGPT and `gapgpt.app` have dedicated compatibility regressions. DeepSeek, Gem
 
 ### Download the ready-to-load extension
 
-**[⬇ Download ChatToAgent for Chrome — v0.7.1 ZIP](https://github.com/Mtgama/ChatToAgent/releases/download/v0.7.1/ChatToAgent-Chrome-v0.7.1.zip)** · [SHA-256 checksums](https://github.com/Mtgama/ChatToAgent/releases/download/v0.7.1/SHA256SUMS.txt)
+**[⬇ Download ChatToAgent for Chrome — v0.7.2 ZIP](https://github.com/Mtgama/ChatToAgent/releases/download/v0.7.2/ChatToAgent-Chrome-v0.7.2.zip)** · [SHA-256 checksums](https://github.com/Mtgama/ChatToAgent/releases/download/v0.7.2/SHA256SUMS.txt)
 
 No Node.js or build tools are needed to load the downloaded extension. Extract the ZIP into a permanent folder, open `chrome://extensions`, enable **Developer mode**, choose **Load unpacked**, and select the extracted folder containing `manifest.json`. Keep that folder in place. Chrome does not install this ZIP directly; this release is an unpacked extension, not a Chrome Web Store package. For an existing installation, replace its extracted files and click **Reload**, then refresh chat tabs.
 
@@ -288,7 +288,7 @@ Personalization and local companion: **mehrdad hasanzade**. Original extension: 
 
 ### دانلود افزونهٔ آماده
 
-**[⬇ دانلود افزونهٔ ChatToAgent برای Chrome — نسخهٔ ۰.۷.۱](https://github.com/Mtgama/ChatToAgent/releases/download/v0.7.1/ChatToAgent-Chrome-v0.7.1.zip)** · [فایل بررسی صحت SHA-256](https://github.com/Mtgama/ChatToAgent/releases/download/v0.7.1/SHA256SUMS.txt)
+**[⬇ دانلود افزونهٔ ChatToAgent برای Chrome — نسخهٔ ۰.۷.۲](https://github.com/Mtgama/ChatToAgent/releases/download/v0.7.2/ChatToAgent-Chrome-v0.7.2.zip)** · [فایل بررسی صحت SHA-256](https://github.com/Mtgama/ChatToAgent/releases/download/v0.7.2/SHA256SUMS.txt)
 
 برای بارگذاری افزونهٔ آماده به Node.js یا ابزار ساخت نیاز ندارید. فایل ZIP را در یک پوشهٔ دائمی استخراج کنید، `chrome://extensions` را باز کنید، **Developer mode** را روشن کنید، **Load unpacked** را بزنید و پوشه‌ای را انتخاب کنید که فایل `manifest.json` داخل آن است. پوشه را جابه‌جا نکنید. این ZIP مستقیماً در Chrome نصب نمی‌شود و نسخهٔ فروشگاه Chrome نیست. برای به‌روزرسانی نصب موجود، فایل‌های استخراج‌شده را جایگزین، افزونه را Reload و تب‌های چت را Refresh کنید.
 

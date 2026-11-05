@@ -18,6 +18,12 @@ for name in required:
     target = (source / name).resolve()
     if not target.is_relative_to(source.resolve()) or not target.is_file():
         raise ValueError(f'Missing or unsafe manifest entry: {name}')
+# The bridge is imported from a sideEffects:false package. Verify the actual
+# production artifact, not only the standalone TypeScript unit-test fixture.
+background = (source / manifest['background']['service_worker']).read_text()
+if 'mehrdadCompanionToken' not in background:
+    raise ValueError('Local-manager pairing bridge is missing from the built background worker')
+
 output = root / 'dist-zip'
 output.mkdir(exist_ok=True)
 archive = output / f'ChatToAgent-Chrome-v{version}.zip'

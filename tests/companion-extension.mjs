@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
-import { transform } from 'esbuild';
+import { build } from 'esbuild';
 
 const id = 'a'.repeat(32);
 const token = 'b'.repeat(64);
@@ -10,9 +10,16 @@ const calls = [];
 const opened = [];
 let listener;
 let failNetwork = false;
-const source = await readFile('chrome-extension/src/background/companion.ts', 'utf8');
-const compiled = await transform(source, { loader: 'ts' });
-vm.runInNewContext(compiled.code, {
+const entry = await readFile('chrome-extension/src/background/index.ts', 'utf8');
+assert.match(entry, /registerCompanionBridge\(\);/, 'The real background entry must register the companion bridge');
+const compiled = await build({
+  stdin: {
+    contents: "import { registerCompanionBridge } from './chrome-extension/src/background/companion'; registerCompanionBridge();",
+    resolveDir: process.cwd(), loader: 'ts',
+  },
+  bundle: true, treeShaking: true, write: false, format: 'iife', platform: 'browser',
+});
+vm.runInNewContext(compiled.outputFiles[0].text, {
   AbortSignal, TypeError,
   chrome: {
     runtime: { id, getURL: path => `chrome-extension://${id}/${path}`, onMessage: { addListener: callback => { listener = callback; } } },
