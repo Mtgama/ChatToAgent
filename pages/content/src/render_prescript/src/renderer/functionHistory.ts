@@ -89,7 +89,7 @@ export const updateHistoryPanel = (
   // Create header
   const header = document.createElement('div');
   header.className = 'function-history-header';
-  header.textContent = 'Execution History';
+  header.textContent = 'تاریخچهٔ اجرا';
   historyPanel.appendChild(header);
 
   // Create execution info
@@ -100,15 +100,15 @@ export const updateHistoryPanel = (
   const executionTime = formatExecutionTime(executionData.executedAt);
 
   executionInfo.innerHTML = `
-    <div>Function: <strong>${executionData.functionName}</strong></div>
-    <div>Last executed: <strong>${executionTime}</strong></div>
+    <div>ابزار: <strong>${executionData.functionName}</strong></div>
+    <div>آخرین اجرا: <strong>${executionTime}</strong></div>
   `;
   historyPanel.appendChild(executionInfo);
 
   // Create re-execute button
   const reExecuteBtn = document.createElement('button');
   reExecuteBtn.className = 'function-reexecute-button';
-  reExecuteBtn.textContent = 'Re-execute';
+  reExecuteBtn.textContent = 'اجرای دوباره';
 
   // Handle re-execution with async mcpClient
   reExecuteBtn.onclick = async () => {
@@ -138,18 +138,18 @@ export const updateHistoryPanel = (
     // Create loading indicator
     const loadingIndicator = document.createElement('div');
     loadingIndicator.className = 'function-results-loading';
-    loadingIndicator.textContent = 'Executing...';
+    loadingIndicator.textContent = 'در حال اجرا…';
     resultsPanel.appendChild(loadingIndicator);
 
     try {
       if (!mcpClient) {
-        displayResult(resultsPanel, loadingIndicator, false, 'Error: mcpClient not found');
+        displayResult(resultsPanel, loadingIndicator, false, 'ارتباط ابزارها برقرار نیست.');
         return;
       }
 
       // Check if mcpClient is ready
       if (!mcpClient.isReady || !mcpClient.isReady()) {
-        displayResult(resultsPanel, loadingIndicator, false, 'Error: MCP client not ready');
+        displayResult(resultsPanel, loadingIndicator, false, 'سرور MCP هنوز آماده نیست.');
         return;
       }
 
@@ -179,11 +179,11 @@ export const updateHistoryPanel = (
         
         // Check for connection-related errors and provide better user feedback
         if (errorMessage.includes('not connected') || errorMessage.includes('connection')) {
-          errorMessage = 'Connection lost. Please check your MCP server connection.';
+          errorMessage = 'ارتباط قطع شد؛ اتصال سرور MCP را بررسی کنید.';
         } else if (errorMessage.includes('timeout')) {
-          errorMessage = 'Request timed out. Please try again.';
+          errorMessage = 'زمان انتظار تمام شد؛ دوباره امتحان کنید.';
         } else if (errorMessage.includes('server unavailable') || errorMessage.includes('SERVER_UNAVAILABLE')) {
-          errorMessage = 'MCP server is unavailable. Please check the server status.';
+          errorMessage = 'سرور MCP در دسترس نیست؛ وضعیت سرویس را بررسی کنید.';
         }
         
         displayResult(resultsPanel, loadingIndicator, false, errorMessage);
@@ -197,7 +197,7 @@ export const updateHistoryPanel = (
         resultsPanel,
         loadingIndicator,
         false,
-        `Unexpected error: ${errorMessage}`,
+        `خطای پیش‌بینی‌نشده: ${errorMessage}`,
       );
     }
   };

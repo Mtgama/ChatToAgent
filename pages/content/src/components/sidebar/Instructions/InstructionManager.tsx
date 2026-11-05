@@ -271,7 +271,8 @@ const InstructionManager: React.FC<InstructionManagerProps> = ({ adapter, tools 
     setInsertSuccess(false);
     try {
       logMessage('Inserting instructions into chat');
-      adapter.insertTextIntoInput(instructions);
+      const inserted = await adapter.insertTextIntoInput(instructions);
+      if (!inserted) throw new Error('درج دستورالعمل انجام نشد.');
       setInsertSuccess(true);
       setTimeout(() => setInsertSuccess(false), 2000);
     } catch (error) {
@@ -364,12 +365,19 @@ const InstructionManager: React.FC<InstructionManagerProps> = ({ adapter, tools 
 
   return (
     <div className="space-y-3">
+      <div className="p-3">
+        <p className="text-xs mb-3">ابتدا راهنمای ابزارها را در گفتگو درج کنید. بعد درخواستتان را بنویسید و کارت ابزار را برای اجرا بررسی کنید.</p>
+        <div className="flex gap-2">
+          <ActionButton onClick={handleInsertInChat} loading={isInserting} success={insertSuccess} color="green" label="درج در گفتگو" />
+          <ActionButton onClick={handleCopyToClipboard} loading={isCopying} success={copySuccess} color="blue" label="کپی راهنما" />
+        </div>
+      </div>
       {/* Custom Instructions Panel */}
       <div className="rounded-lg bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800 sidebar-card">
         <div className="p-3 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <Typography variant="h4" className="text-slate-700 dark:text-slate-300">
-              Custom Instructions
+              دستورالعمل شخصی
             </Typography>
             <label className="flex items-center gap-1.5">
               <input
@@ -378,20 +386,20 @@ const InstructionManager: React.FC<InstructionManagerProps> = ({ adapter, tools 
                 onChange={e => handleCustomInstructionsToggle(e.target.checked)}
                 className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
               />
-              <span className="text-xs text-slate-600 dark:text-slate-400">Enable</span>
+              <span className="text-xs text-slate-600 dark:text-slate-400">فعال</span>
             </label>
           </div>
           <div className="flex items-center gap-1.5">
             {isEditingCustom ? (
               <>
-                <ActionButton onClick={handleCustomInstructionsSave} color="green" label="Save" />
-                <ActionButton onClick={handleCustomInstructionsCancel} color="red" label="Cancel" />
+                <ActionButton onClick={handleCustomInstructionsSave} color="green" label="ذخیره" />
+                <ActionButton onClick={handleCustomInstructionsCancel} color="red" label="انصراف" />
               </>
             ) : (
               <ActionButton
                 onClick={() => setIsEditingCustom(true)}
                 color="blue"
-                label="Edit"
+                label="ویرایش"
                 disabled={!customInstructionsEnabled}
               />
             )}
@@ -403,7 +411,7 @@ const InstructionManager: React.FC<InstructionManagerProps> = ({ adapter, tools 
             <textarea
               value={customInstructions}
               onChange={e => setCustomInstructions(e.target.value)}
-              placeholder="Enter your custom instructions here..."
+              placeholder="دستورالعمل شخصی را اینجا بنویسید…"
               className="w-full h-32 p-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200"
             />
           ) : (
@@ -414,7 +422,7 @@ const InstructionManager: React.FC<InstructionManagerProps> = ({ adapter, tools 
                 </pre>
               ) : (
                 <div className="text-xs text-slate-500 dark:text-slate-400 italic p-3">
-                  {customInstructionsEnabled ? 'No custom instructions set' : 'Custom instructions disabled'}
+                  {customInstructionsEnabled ? 'هنوز دستورالعملی نوشته نشده' : 'دستورالعمل شخصی غیرفعال است'}
                 </div>
               )}
             </div>
@@ -426,30 +434,30 @@ const InstructionManager: React.FC<InstructionManagerProps> = ({ adapter, tools 
       <div className="rounded-lg bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800 sidebar-card">
         <div className="p-3 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
           <Typography variant="h4" className="text-slate-700 dark:text-slate-300">
-            Instructions
+            راهنمای ابزارها
           </Typography>
           <div className="flex items-center gap-1.5">
             {isEditing ? (
               <>
-                <ActionButton onClick={handleSave} color="green" label="Save" />
-                <ActionButton onClick={handleCancel} color="red" label="Cancel" />
+                <ActionButton onClick={handleSave} color="green" label="ذخیره" />
+                <ActionButton onClick={handleCancel} color="red" label="انصراف" />
               </>
             ) : (
               <>
-                <ActionButton onClick={() => setIsEditing(true)} color="blue" label="Edit" />
+                <ActionButton onClick={() => setIsEditing(true)} color="blue" label="ویرایش" />
                 {/* <ActionButton 
                   onClick={handleCopyToClipboard} 
                   loading={isCopying}
                   success={copySuccess}
                   color="amber" 
-                  label="Copy" 
+                  label="کپی"
                 />
                 <ActionButton 
                   onClick={handleInsertInChat} 
                   loading={isInserting}
                   success={insertSuccess}
                   color="green" 
-                  label="Insert" 
+                  label="درج در گفتگو"
                 />
                 <ActionButton 
                   onClick={handleAttachAsFile} 
@@ -457,7 +465,7 @@ const InstructionManager: React.FC<InstructionManagerProps> = ({ adapter, tools 
                   success={attachSuccess}
                   disabled={!adapter.supportsFileUpload()} 
                   color="purple" 
-                  label="Attach" 
+                  label="پیوست"
                 /> */}
               </>
             )}

@@ -18,25 +18,13 @@ const PopoverPortal: React.FC<PopoverPortalProps> = ({ children, isOpen, trigger
   const dragHandleRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Create portal container if it doesn't exist
-    if (!portalContainer) {
-      const div = document.createElement('div');
-      div.id = 'mcp-popover-portal';
-      div.style.position = 'absolute';
-      div.style.zIndex = '10000';
-      div.style.top = '0';
-      div.style.left = '0';
-      document.body.appendChild(div);
-      setPortalContainer(div);
-    }
-
-    return () => {
-      // Cleanup on unmount
-      if (portalContainer && document.body.contains(portalContainer)) {
-        document.body.removeChild(portalContainer);
-      }
-    };
-  }, [portalContainer]);
+    const div = document.createElement('div');
+    div.id = 'mcp-popover-portal';
+    div.style.cssText = 'position:fixed;z-index:2147483646;top:0;left:0';
+    document.body.appendChild(div);
+    setPortalContainer(div);
+    return () => div.remove();
+  }, []);
 
   useEffect(() => {
     const updatePosition = () => {
@@ -221,7 +209,7 @@ const PopoverPortal: React.FC<PopoverPortalProps> = ({ children, isOpen, trigger
           transition: 'opacity 0.15s ease, backdrop-filter 0.15s ease, background-color 0.15s ease',
         }}>
         {children}
-        <div ref={dragHandleRef} className="mcp-drag-handle" onMouseDown={handleDragStart} title="Drag to move" />
+        <div ref={dragHandleRef} className="mcp-drag-handle" onMouseDown={handleDragStart} title="برای جابه‌جایی بکشید" />
       </div>
     </div>,
     portalContainer,

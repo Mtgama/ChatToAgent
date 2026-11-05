@@ -3,6 +3,7 @@ import { jsonSchemaToCsn } from './schema_converter';
 import { chatgptInstructions } from './website_specific_instruction/chatgpt';
 import { geminiInstructions } from './website_specific_instruction/gemini';
 import { createLogger } from '@extension/shared/lib/logger';
+import { generateManualInstructions } from './manualInstructions';
 
 /**
  * Generates markdown instructions for using MCP tools based on available tools
@@ -21,6 +22,9 @@ export const generateInstructionsJson = (
 ): string => {
   if (!tools || tools.length === 0) {
     return '# No tools available\n\nConnect to the MCP server to see available tools.';
+  }
+  if (['gapgpt.app', 'www.gapgpt.app'].includes(window.location.hostname)) {
+    return generateManualInstructions(tools, customInstructionsEnabled ? customInstructions : undefined);
   }
 
   // Start with a header

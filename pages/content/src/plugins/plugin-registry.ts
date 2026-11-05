@@ -26,6 +26,7 @@ import { T3ChatAdapter } from './adapters/t3chat.adapter';
 import { MistralAdapter } from './adapters/mistral.adapter';
 import { SidebarPlugin } from './sidebar.plugin';
 import { ChatGPTAdapter } from './adapters/chatgpt.adapter';
+import { GapGPTAdapter } from './adapters/gapgpt.adapter';
 import { KimiAdapter } from './adapters/kimi.adapter';
 import { ZAdapter } from './adapters/z.adapter';
 import { QwenAdapter } from './adapters/qwenchat.adapter';
@@ -764,6 +765,24 @@ class PluginRegistry {
       });
 
       // Register ChatGPTAdapter factory for OpenAI ChatGPT
+      this.registerAdapterFactory({
+        name: 'gapgpt-adapter',
+        version: '1.0.0',
+        type: 'website-adapter',
+        hostnames: ['gapgpt.app', 'www.gapgpt.app'],
+        capabilities: ['text-insertion', 'form-submission', 'dom-manipulation'],
+        create: () => new GapGPTAdapter(),
+        config: {
+          id: 'gapgpt-adapter',
+          name: 'GapGPT Adapter',
+          description: 'GapGPT chat composer and MCP result insertion',
+          version: '1.0.0',
+          enabled: true,
+          priority: 5,
+          settings: {},
+        },
+      });
+
       this.registerAdapterFactory({
         name: 'chatgpt-adapter',
         version: '2.0.0',

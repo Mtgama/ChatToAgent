@@ -50,6 +50,7 @@ declare global {
 export class SidebarManager extends BaseSidebarManager {
   private static perplexityInstance: SidebarManager | null = null;
   private static chatgptInstance: SidebarManager | null = null;
+  private static gapgptInstance: SidebarManager | null = null;
   private static grokInstance: SidebarManager | null = null;
   private static geminiInstance: SidebarManager | null = null;
   private static aistudioInstance: SidebarManager | null = null;
@@ -87,6 +88,9 @@ export class SidebarManager extends BaseSidebarManager {
    */
   public static getInstance(siteType: SiteType): SidebarManager {
     switch (siteType) {
+      case 'gapgpt':
+        if (!SidebarManager.gapgptInstance) SidebarManager.gapgptInstance = new SidebarManager(siteType);
+        return SidebarManager.gapgptInstance;
       case 'perplexity':
         if (!SidebarManager.perplexityInstance) {
           SidebarManager.perplexityInstance = new SidebarManager(siteType);
@@ -607,6 +611,9 @@ export class SidebarManager extends BaseSidebarManager {
 
     // Clear the appropriate singleton instance
     switch (this.siteType) {
+      case 'gapgpt':
+        if (SidebarManager.gapgptInstance === this) SidebarManager.gapgptInstance = null;
+        break;
       case 'perplexity':
         if (SidebarManager.perplexityInstance === this) {
           SidebarManager.perplexityInstance = null;

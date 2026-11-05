@@ -252,14 +252,14 @@ const AvailableTools: React.FC<AvailableToolsProps> = ({ tools, onExecute, onRef
             <button
               onClick={toggleComponentExpansion}
               className="p-1 mr-2 rounded transition-colors bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600"
-              aria-label={isExpanded ? 'Collapse tools' : 'Expand tools'}>
+              aria-label={isExpanded ? 'جمع‌کردن ابزارها' : 'نمایش ابزارها'}>
               <Icon
                 name="chevron-right"
                 size="sm"
                 className={cn('text-slate-600 dark:text-slate-300 transition-transform', isExpanded ? 'rotate-90' : '')}
               />
             </button>
-            <Typography variant="h3">Available Tools</Typography>
+            <Typography variant="h3">ابزارهای در دسترس</Typography>
           </div>
           <Button
             onClick={handleRefresh}
@@ -270,7 +270,7 @@ const AvailableTools: React.FC<AvailableToolsProps> = ({ tools, onExecute, onRef
               'h-9 w-9 p-0',
               isRefreshing ? 'opacity-50' : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600',
             )}
-            aria-label="Refresh tools">
+            aria-label="تازه‌سازی ابزارها">
             <Icon
               name="refresh"
               size="sm"
@@ -283,7 +283,7 @@ const AvailableTools: React.FC<AvailableToolsProps> = ({ tools, onExecute, onRef
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
             <div className="flex items-center gap-2">
               <Typography variant="small" className="text-slate-600 dark:text-slate-400">
-                {enabledTools.size} of {totalToolsCount} tools enabled
+                {enabledTools.size} از {totalToolsCount} ابزار فعال
               </Typography>
             </div>
             <div className="flex items-center gap-2">
@@ -293,7 +293,7 @@ const AvailableTools: React.FC<AvailableToolsProps> = ({ tools, onExecute, onRef
                 variant="outline"
                 disabled={isRefreshing || isLoadingEnablement || totalToolsCount === 0}
                 className="h-8 px-3 text-xs bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800">
-                Enable All
+                فعال‌کردن همه
               </Button>
               <Button
                 onClick={handleDisableAll}
@@ -301,7 +301,7 @@ const AvailableTools: React.FC<AvailableToolsProps> = ({ tools, onExecute, onRef
                 variant="outline"
                 disabled={isRefreshing || isLoadingEnablement || totalToolsCount === 0}
                 className="h-8 px-3 text-xs bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800">
-                Disable All
+                غیرفعال‌کردن همه
               </Button>
               {hasUnsavedChanges && (
                 <>
@@ -310,14 +310,14 @@ const AvailableTools: React.FC<AvailableToolsProps> = ({ tools, onExecute, onRef
                     size="sm"
                     variant="outline"
                     className="h-8 px-3 text-xs bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800">
-                    Save Changes
+                    ذخیرهٔ تغییرات
                   </Button>
                   <Button
                     onClick={handleDiscardChanges}
                     size="sm"
                     variant="outline"
                     className="h-8 px-3 text-xs bg-orange-50 hover:bg-orange-100 dark:bg-orange-900/20 dark:hover:bg-orange-900/30 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800">
-                    Discard
+                    انصراف
                   </Button>
                 </>
               )}
@@ -332,7 +332,7 @@ const AvailableTools: React.FC<AvailableToolsProps> = ({ tools, onExecute, onRef
             <div className="relative">
               <input
                 type="text"
-                placeholder="Search tools..."
+                placeholder="جستجو در ابزارها…"
                 value={searchTerm}
                 onChange={handleSearchChange}
                 className="w-full px-3 py-2 pl-10 border border-slate-300 dark:border-slate-600 rounded text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
@@ -347,7 +347,7 @@ const AvailableTools: React.FC<AvailableToolsProps> = ({ tools, onExecute, onRef
             <div className="flex items-center justify-center py-8 text-slate-500 dark:text-slate-400">
               <Icon name="refresh" className="w-8 h-8 animate-spin mr-3" />
               <Typography variant="body" className="text-lg">
-                {isRefreshing ? 'Refreshing tools...' : 'Loading tool preferences...'}
+                {isRefreshing ? 'در حال تازه‌سازی ابزارها…' : 'در حال دریافت تنظیمات…'}
               </Typography>
             </div>
           )}
@@ -358,10 +358,10 @@ const AvailableTools: React.FC<AvailableToolsProps> = ({ tools, onExecute, onRef
                 <>
                   <Icon name="search" className="w-12 h-12 mx-auto mb-3" />
                   <Typography variant="body" className="text-lg">
-                    No tools match your search
+                    ابزاری با این عبارت پیدا نشد
                   </Typography>
                   <Typography variant="small" className="mt-1">
-                    Try a different search term
+                    عبارت دیگری را جستجو کنید
                   </Typography>
                 </>
               ) : (
@@ -380,20 +380,20 @@ const AvailableTools: React.FC<AvailableToolsProps> = ({ tools, onExecute, onRef
                     />
                   </svg>
                   <Typography variant="body" className="text-lg">
-                    {!isLoaded ? 'Loading tools...' : 'No tools available'}
+                    {!isLoaded ? 'در حال دریافت ابزارها…' : 'هنوز ابزاری در دسترس نیست'}
                   </Typography>
                   <Typography variant="small" className="mt-1">
                     {isLoaded ? (
                       <>
-                        Check your server connection or{' '}
+                        اتصال سرور را بررسی کنید یا{' '}
                         <button
                           onClick={handleRefresh}
                           className="text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100">
-                          refresh
+                          تازه‌سازی کنید
                         </button>
                       </>
                     ) : (
-                      'Please wait while we connect to the server'
+                      'در حال اتصال به سرور؛ کمی صبر کنید.'
                     )}
                   </Typography>
                 </>
@@ -418,7 +418,7 @@ const AvailableTools: React.FC<AvailableToolsProps> = ({ tools, onExecute, onRef
                           <button
                             onClick={() => toggleToolExpansion(serverName)}
                             className="p-1 mr-2 rounded transition-colors hover:bg-slate-200 dark:hover:bg-slate-700"
-                            aria-label={groupExpanded ? 'Collapse group' : 'Expand group'}>
+                            aria-label={groupExpanded ? 'جمع‌کردن گروه' : 'نمایش گروه'}>
                             <Icon
                               name="chevron-right"
                               size="sm"
@@ -441,13 +441,13 @@ const AvailableTools: React.FC<AvailableToolsProps> = ({ tools, onExecute, onRef
                             {serverName}
                           </Typography>
                           <Typography variant="small" className="ml-2 text-slate-500 dark:text-slate-400">
-                            ({tools.length} tools)
+                            ({tools.length} ابزار)
                           </Typography>
                         </div>
                         <div className="flex items-center gap-2">
                           {groupPartiallyEnabled && (
                             <span className="px-2 py-1 text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 rounded">
-                              Partial
+                              بخشی فعال
                             </span>
                           )}
                           {!groupEnabled && !groupPartiallyEnabled && (

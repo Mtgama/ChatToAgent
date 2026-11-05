@@ -7,6 +7,7 @@ import AvailableTools from './AvailableTools/AvailableTools';
 import InstructionManager from './Instructions/InstructionManager';
 import InputArea from './InputArea/InputArea';
 import Settings from './Settings/Settings';
+import { mehrdadStyles } from './styles/mehrdad';
 import { useMcpCommunication } from '@src/hooks/useMcpCommunication';
 import { logMessage } from '@src/utils/helpers';
 import { eventBus } from '@src/events/event-bus';
@@ -637,14 +638,16 @@ const Sidebar: React.FC<SidebarProps> = ({ initialPreferences }) => {
   return (
     <div
       ref={sidebarRef}
+      dir="rtl" lang="fa"
       className={cn(
-        'fixed top-0 right-0 h-screen bg-white dark:bg-slate-900 shadow-lg z-50 flex flex-col border-l border-slate-200 dark:border-slate-700 sidebar',
+        'fixed top-0 right-0 h-screen bg-white dark:bg-slate-900 shadow-lg z-50 flex flex-col border-l border-slate-200 dark:border-slate-700 sidebar mehrdad-sidebar',
         isPushMode ? 'push-mode' : '',
         isResizingRef.current ? 'resizing' : '',
         isMinimized ? 'collapsed' : '',
         isTransitioning ? 'sidebar-transitioning' : '',
       )}
       style={{ width: isMinimized ? `${SIDEBAR_MINIMIZED_WIDTH}px` : `${sidebarWidth}px` }}>
+      <style>{mehrdadStyles}</style>
       {/* Resize Handle - only visible when not minimized */}
       {!isMinimized && (
         <ResizeHandle
@@ -662,38 +665,39 @@ const Sidebar: React.FC<SidebarProps> = ({ initialPreferences }) => {
             <div className="flex items-center space-x-2">
               {/* Always show the header content immediately */}
               <a
-                href="https://mcpsuperassistant.ai/"
+                href="#" onClick={event => { event.preventDefault(); chrome.runtime.sendMessage({ type: 'mehrdad:companion', action: 'open' }).catch(() => {}); }}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Visit MCP Super Assistant Website"
+                aria-label="بازکردن مدیریت محلی"
                 className="block">
                 {' '}
                 {/* Make link block for sizing */}
                 <img
                   src={chrome.runtime.getURL('icon-34.png')}
-                  alt="MCP Logo"
+                  alt="نشان Mehrdad MCP"
                   className="w-8 h-8 rounded-md " // Increase size & add rounded corners
                 />
               </a>
               <>
                 {/* Wrap title in link */}
                 <a
-                  href="https://mcpsuperassistant.ai/"
+                  href="#" onClick={event => { event.preventDefault(); chrome.runtime.sendMessage({ type: 'mehrdad:companion', action: 'open' }).catch(() => {}); }}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-slate-800 dark:text-slate-100 hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-150 no-underline"
-                  aria-label="Visit MCP Super Assistant Website">
+                  aria-label="بازکردن مدیریت محلی">
                   <Typography variant="h4" className="font-semibold">
-                    MCP SuperAssistant
+                    Mehrdad MCP
+                    <small className="block text-[10px]" dir="ltr">mehrdad hasanzade</small>
                   </Typography>
                 </a>
                 {/* Existing icon link */}
                 <a
-                  href="https://mcpsuperassistant.ai/"
+                  href="#" onClick={event => { event.preventDefault(); chrome.runtime.sendMessage({ type: 'mehrdad:companion', action: 'open' }).catch(() => {}); }}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="ml-1 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 transition-colors duration-150"
-                  aria-label="Visit MCP Super Assistant Website">
+                  aria-label="بازکردن مدیریت محلی">
                   <Icon name="arrow-up-right" size="xs" className="inline-block align-baseline" />
                 </a>
               </>
@@ -704,21 +708,21 @@ const Sidebar: React.FC<SidebarProps> = ({ initialPreferences }) => {
                 variant="ghost"
                 size="icon"
                 onClick={handleThemeToggle}
-                aria-label={`Toggle theme (current: ${theme})`}
+                aria-label={`تغییر تم (current: ${theme})`}
                 className="hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-all duration-200 hover:scale-105">
                 <Icon
                   name={getCurrentThemeIcon()}
                   size="sm"
                   className="transition-all text-indigo-600 dark:text-indigo-400"
                 />
-                <span className="sr-only">Toggle theme</span>
+                <span className="sr-only">تغییر تم</span>
               </Button>
               {/* Minimize Button */}
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={handleToggleMinimize}
-                aria-label="Minimize sidebar"
+                aria-label="جمع‌کردن پنل"
                 className="hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-all duration-200 hover:scale-105">
                 <Icon name="chevron-right" className="h-4 w-4 text-slate-700 dark:text-slate-300" />
               </Button>
@@ -730,7 +734,7 @@ const Sidebar: React.FC<SidebarProps> = ({ initialPreferences }) => {
             variant="ghost"
             size="icon"
             onClick={handleToggleMinimize}
-            aria-label="Expand sidebar"
+            aria-label="بازکردن پنل"
             className="mx-auto hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-all duration-200 hover:scale-110">
             <Icon name="chevron-left" className="h-4 w-4 text-slate-700 dark:text-slate-300" />
           </Button>
@@ -757,11 +761,11 @@ const Sidebar: React.FC<SidebarProps> = ({ initialPreferences }) => {
                     <Icon name="alert-triangle" size="sm" className="text-red-600 dark:text-red-400 mt-0.5" />
                     <div className="flex-1">
                       <Typography variant="subtitle" className="text-red-800 dark:text-red-200 font-medium">
-                        {extensionContextInvalid ? 'Extension Reloaded' : 'Warning'}
+                        {extensionContextInvalid ? 'افزونه بازخوانی شد' : 'هشدار'}
                       </Typography>
                       <Typography variant="caption" className="text-red-700 dark:text-red-300">
                         {extensionContextInvalid
-                          ? 'The extension was reloaded. Please refresh this page to restore full functionality.'
+                          ? 'افزونه بازخوانی شده است؛ برای ادامه صفحه را تازه‌سازی کنید.'
                           : `Some features may be limited: ${initializationError}`
                         }
                       </Typography>
@@ -772,7 +776,7 @@ const Sidebar: React.FC<SidebarProps> = ({ initialPreferences }) => {
                             size="sm"
                             onClick={() => window.location.reload()}
                             className="border-red-300 dark:border-red-600 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-800 mr-2">
-                            Refresh Page
+                            تازه‌سازی صفحه
                           </Button>
                         </div>
                       )}
@@ -784,7 +788,7 @@ const Sidebar: React.FC<SidebarProps> = ({ initialPreferences }) => {
                       size="sm"
                       onClick={() => setInitializationError(null)}
                       className="border-red-300 dark:border-red-600 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-800">
-                      Dismiss
+                      بستن
                     </Button>
                   )}
                 </div>
@@ -800,10 +804,10 @@ const Sidebar: React.FC<SidebarProps> = ({ initialPreferences }) => {
                 <CardContent className="p-3 space-y-3">
                   <div className="flex items-center justify-between">
                     <Typography variant="subtitle" className="text-slate-700 dark:text-slate-300 font-medium">
-                      Push Content Mode
+                      جابه‌جایی محتوای صفحه
                     </Typography>
                     <ToggleWithoutLabel
-                      label="Push Content Mode"
+                      label="جابه‌جایی محتوای صفحه"
                       checked={isPushMode}
                       onChange={handlePushModeToggle}
                     />
@@ -851,7 +855,7 @@ const Sidebar: React.FC<SidebarProps> = ({ initialPreferences }) => {
                         : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-t-lg',
                     )}
                     onClick={() => setActiveTab('availableTools')}>
-                    Available Tools
+                    ابزارها
                   </button>
                   <button
                     className={cn(
@@ -861,7 +865,7 @@ const Sidebar: React.FC<SidebarProps> = ({ initialPreferences }) => {
                         : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-t-lg',
                     )}
                     onClick={() => setActiveTab('instructions')}>
-                    Instructions
+                    راهنما
                   </button>
                   <button
                     className={cn(
@@ -871,7 +875,7 @@ const Sidebar: React.FC<SidebarProps> = ({ initialPreferences }) => {
                         : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-t-lg',
                     )}
                     onClick={() => setActiveTab('settings')}>
-                    Settings
+                    تنظیمات
                   </button>
                 </div>
               </div>

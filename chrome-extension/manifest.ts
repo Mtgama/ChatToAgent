@@ -20,15 +20,13 @@ const packageJson = JSON.parse(readFileSync('./package.json', 'utf8'));
 const manifest = {
   manifest_version: 3,
   default_locale: 'en',
-  name: 'MCP SuperAssistant',
-  browser_specific_settings: {
-    gecko: {
-      id: 'saurabh@mcpsuperassistant.ai',
-    },
-  },
+  name: 'Mehrdad MCP | دستیار محلی',
   version: packageJson.version,
-  description: 'MCP SuperAssistant',
+  description: 'دستیار فارسی MCP، مدیریت ابزارها و فضای کار — mehrdad hasanzade',
   host_permissions: [
+    'http://127.0.0.1:3007/*',
+    'https://gapgpt.app/*',
+    'https://www.gapgpt.app/*',
     '*://*.perplexity.ai/*',
     '*://*.chat.openai.com/*',
     '*://*.chatgpt.com/*',
@@ -51,6 +49,11 @@ const manifest = {
   ],
 
   permissions: ['storage', 'clipboardWrite'],
+  action: {
+    default_popup: 'mehrdad-popup.html',
+    default_title: 'Mehrdad MCP — mehrdad hasanzade',
+    default_icon: 'icon-34.png',
+  },
   // permissions: ['storage', 'scripting', 'clipboardWrite'],
   // options_page: 'options/index.html',
   background: {
@@ -67,9 +70,14 @@ const manifest = {
   icons: {
     128: 'icon-128.png',
     34: 'icon-34.png',
-    16: 'icon-16.png',
+    16: 'icon-34.png',
   },
   content_scripts: [
+    {
+      matches: ['https://gapgpt.app/*', 'https://www.gapgpt.app/*'],
+      js: ['content/index.iife.js'],
+      run_at: 'document_idle',
+    },
     // {
     //   matches: ['http://*/*', 'https://*/*', '<all_urls>'],
     //   js: ['content/index.iife.js'],

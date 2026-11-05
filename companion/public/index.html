@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mehrdad MCP · مدیریت ابزارها</title><link rel="icon" href="/brand.svg" type="image/svg+xml"><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script></head>
+<body>
+<div class="layout">
+  <aside class="navigation">
+    <a class="brand" href="/"><img src="/brand.svg" alt="" width="44" height="44"><span><strong>Mehrdad MCP</strong><small dir="ltr">mehrdad hasanzade</small></span></a>
+    <p class="eyebrow">فضای کار محلی</p>
+    <nav aria-label="بخش‌های برنامه">
+      <button class="nav active" data-view="workspace">◫ <span>پوشه و ابزارها</span></button>
+      <button class="nav" data-view="connection">⇄ <span>اتصال افزونه و ایجنت</span></button>
+      <button class="nav" data-view="logs">≡ <span>گزارش فعالیت</span></button>
+    </nav>
+    <div class="nav-bottom"><span class="local-dot"></span> فقط روی این رایانه <small>نسخهٔ ۰.۷.۱ · بر پایهٔ MCP SuperAssistant</small></div>
+  </aside>
+  <main>
+    <header class="topbar"><span>مدیریت MCP</span><button id="theme" class="quiet" aria-label="تغییر تم">تم روشن / تیره</button></header>
+    <section id="pair" class="pair" hidden>
+      <p class="eyebrow">اتصال به برنامهٔ محلی</p><h1>کلید اتصال را وارد کن</h1>
+      <p>برنامه را از میانبر «Mehrdad MCP» باز کن تا ورود خودکار انجام شود، یا کلید اتصال را وارد کن.</p>
+      <form id="pair-form"><label for="pair-token">کلید اتصال</label><input id="pair-token" type="password" autocomplete="off" dir="ltr" required><button class="primary" type="submit">اتصال به پنل</button></form>
+    </section>
+    <div id="workspace-app" hidden>
+      <section class="service-bar" aria-label="وضعیت سرویس"><div><span id="status" class="status">در حال بررسی…</span><p id="service-detail">ارتباط با سرویس محلی</p></div><div class="actions"><button id="start" class="primary">راه‌اندازی MCP</button><button id="restart" class="quiet">راه‌اندازی دوباره</button><button id="stop" class="quiet danger">توقف</button></div></section>
+      <section class="view" id="view-workspace">
+        <div class="section-heading"><div><p class="eyebrow">پوشه و دسترسی‌ها</p><h1>ابزارها در کجا کار کنند؟</h1><p>فقط این پوشه و زیرپوشه‌هایش در دسترس ابزار فایل قرار می‌گیرند.</p></div><span class="section-number">01</span></div>
+        <form id="settings-form">
+          <label for="workspace">پوشهٔ پروژه</label><div class="path-row"><input id="workspace" dir="ltr" spellcheck="false" autocomplete="off" required><button type="button" id="browse" class="quiet">انتخاب پوشه</button></div>
+          <p class="hint">تغییر پوشه برای همهٔ مشتریان متصل، از جمله افزونه و OpenCode، اعمال می‌شود.</p>
+          <div class="divider"></div>
+          <h2>ابزارهای پایه</h2><p class="muted">ابزارهایی را که در این فضای کار لازم داری فعال کن.</p>
+          <label class="tool-row"><span class="tool-mark">⌘</span><span><strong>فایل‌ها</strong><small>خواندن، نوشتن و مدیریت فایل در پوشهٔ انتخاب‌شده</small></span><input id="tool-filesystem" type="checkbox" role="switch"></label>
+          <label class="tool-row"><span class="tool-mark">◇</span><span><strong>حافظه</strong><small>نگه‌داری اطلاعات و ارتباط‌ها بین گفتگوها</small></span><input id="tool-memory" type="checkbox" role="switch"></label>
+          <label class="tool-row"><span class="tool-mark">↳</span><span><strong>حل مسئله</strong><small>برنامه‌ریزی و بررسی گام‌به‌گام</small></span><input id="tool-thinking" type="checkbox" role="switch"></label>
+          <label class="check-row"><input id="autostart" type="checkbox">راه‌اندازی خودکار MCP هنگام بازشدن برنامهٔ مدیریت</label>
+          <footer class="form-footer"><p>ذخیرهٔ تغییرات، سرویسِ در حال اجرا را دوباره راه‌اندازی می‌کند.</p><button class="primary" type="submit">ذخیره و اعمال</button></footer>
+        </form>
+        <section class="installation"><div><h2>نصب و آماده‌سازی</h2><p id="install-state">در حال بررسی بسته‌ها…</p></div><button id="install" class="quiet">نصب / تعمیر ابزارهای پایه</button></section>
+      </section>
+      <section class="view" id="view-connection" hidden>
+        <div class="section-heading"><div><p class="eyebrow">یک سرویس، چند مشتری</p><h1>اتصال افزونه و ایجنت</h1><p>همین ابزارها را در مرورگر و OpenCode استفاده کن.</p></div><span class="section-number">02</span></div>
+        <h2>۱. افزونهٔ Chrome</h2><p>روی آیکون Mehrdad MCP در نوار Chrome کلیک کن و کلید زیر را در بخش «اتصال به مدیریت محلی» وارد کن.</p>
+        <div class="connection-line"><span>کلید اتصال محلی</span><button id="copy-token" class="quiet">کپی کلید اتصال</button></div><p class="hint">کلید فقط داخل افزونه ذخیره می‌شود؛ آن را در پیام مدل یا وب‌سایت‌ها وارد نکن.</p>
+        <div class="connection-line"><span>نشانی سرور MCP</span><code id="endpoint" dir="ltr"></code><button id="copy-endpoint" class="quiet">کپی نشانی</button></div>
+        <p>در پنل چت، بخش «راهنما» را باز کن و دستورالعمل ابزارها را درج کن. بعد درخواستت را بنویس، کارت ابزار را بررسی کن و «اجرا» را بزن.</p>
+        <div class="divider"></div><h2>۲. OpenCode</h2><p>این بخش را در تنظیمات MCP فایل opencode.jsonc ادغام کن.</p><pre id="opencode" dir="ltr"></pre><button id="copy-opencode" class="quiet">کپی تنظیمات OpenCode</button>
+        <div class="divider"></div><h2>نصب افزونهٔ محلی</h2><p>در chrome://extensions حالت توسعه‌دهنده را روشن کن، Load unpacked را بزن و پوشهٔ dist ساخته‌شدهٔ پروژه را انتخاب کن. فقط یک نسخه از افزونه فعال باشد.</p>
+      </section>
+      <section class="view" id="view-logs" hidden>
+        <div class="section-heading"><div><p class="eyebrow">گزارش زنده</p><h1>الان چه اتفاقی می‌افتد؟</h1><p>پیام‌های سرویس، نصب و خطاهای اخیر.</p></div><span class="section-number">03</span></div>
+        <div class="log-toolbar"><label for="log-filter">فیلتر گزارش</label><input id="log-filter" placeholder="جستجو در پیام‌ها…"><button id="pause-logs" class="quiet">توقف نمایش</button><button id="download-logs" class="quiet">دریافت گزارش</button></div>
+        <div id="log-list" class="logs" role="log" aria-label="لاگ سرویس" tabindex="0"></div><p class="hint">حداکثر ۶۰۰ پیام اخیر نمایش داده می‌شود. گزارش ممکن است نام مسیرها را داشته باشد.</p>
+      </section>
+    </div>
+    <p id="notice" role="status" class="notice" hidden></p>
+  </main>
+</div>
+</body></html>

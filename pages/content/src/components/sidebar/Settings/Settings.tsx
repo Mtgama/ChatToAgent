@@ -1,4 +1,5 @@
 import React from 'react';
+import WorkspaceSettings from './WorkspaceSettings';
 import { useUserPreferences } from '@src/hooks';
 import { Card, CardContent } from '@src/components/ui/card';
 import { Typography } from '../ui';
@@ -64,10 +65,11 @@ const Settings: React.FC = () => {
 
   return (
     <div className="p-4 space-y-4">
+      <WorkspaceSettings />
       <Card className="border-slate-200 dark:border-slate-700 dark:bg-slate-800">
         <CardContent className="p-4">
           <Typography variant="h4" className="mb-4 text-slate-700 dark:text-slate-300">
-            Automation Delay Settings
+            زمان‌بندی اجرای خودکار
           </Typography>
           
           <div className="space-y-4">
@@ -77,7 +79,7 @@ const Settings: React.FC = () => {
                 htmlFor="auto-insert-delay"
                 className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
               >
-                Auto Insert Delay (seconds)
+                تأخیر درج نتیجه (ثانیه)
               </label>
               <input
                 id="auto-insert-delay"
@@ -94,7 +96,7 @@ const Settings: React.FC = () => {
                 )}
               />
               <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                Delay before auto-inserting content
+                زمان انتظار پیش از درج خودکار نتیجه
               </p>
             </div>
 
@@ -104,7 +106,7 @@ const Settings: React.FC = () => {
                 htmlFor="auto-submit-delay"
                 className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
               >
-                Auto Submit Delay (seconds)
+                تأخیر ارسال پیام (ثانیه)
               </label>
               <input
                 id="auto-submit-delay"
@@ -121,7 +123,7 @@ const Settings: React.FC = () => {
                 )}
               />
               <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                Delay before auto-submitting form
+                زمان انتظار پیش از ارسال خودکار پیام
               </p>
             </div>
 
@@ -131,7 +133,7 @@ const Settings: React.FC = () => {
                 htmlFor="auto-execute-delay"
                 className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
               >
-                Auto Execute Delay (seconds)
+                تأخیر اجرای ابزار (ثانیه)
               </label>
               <input
                 id="auto-execute-delay"
@@ -148,7 +150,7 @@ const Settings: React.FC = () => {
                 )}
               />
               <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                Delay before auto-executing functions
+                زمان انتظار پیش از اجرای خودکار ابزار
               </p>
             </div>
           </div>

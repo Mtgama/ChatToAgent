@@ -1,4 +1,5 @@
 import 'webextension-polyfill';
+import './companion';
 import { exampleThemeStorage } from '@extension/storage';
 import { RemoteConfigManager } from './remote-config-manager';
 import {
@@ -606,6 +607,7 @@ logger.debug("Edit 'chrome-extension/src/background/index.ts' and save to reload
 // --- Enhanced Message Handling ---
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message?.type === 'mehrdad:companion') return false;
   // Enhanced logging for debugging
   logger.debug('[Background] Received message:', {
     type: message.type || message.command,

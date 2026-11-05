@@ -1,9 +1,9 @@
 import type React from 'react';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { useCurrentAdapter, useUserPreferences, useMCPState } from '../../hooks';
+import { useCurrentAdapter, useUserPreferences, useMCPState, useTheme } from '../../hooks';
 import PopoverPortal from './PopoverPortal';
-import { instructionsState } from '../sidebar/Instructions/InstructionManager';
+import { useDefaultInstructions } from '../../hooks/useDefaultInstructions';
 import { AutomationService } from '../../services/automation.service';
 import { createLogger } from '@extension/shared/lib/logger';
 
@@ -19,6 +19,7 @@ export interface MCPToggleState {
 
 // Hook to detect dark mode
 const useThemeDetector = () => {
+  const { theme } = useTheme();
   const [isDarkMode, setIsDarkMode] = useState(
     window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches,
   );
@@ -31,489 +32,46 @@ const useThemeDetector = () => {
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
-  return isDarkMode;
+  return theme === 'dark' || (theme === 'system' && isDarkMode);
 };
 
 // CSS for the component using the provided color scheme
 const styles = `
-.mcp-popover-container {
-  position: relative;
-  display: inline-block;
-}
-
-.mcp-main-button {
-  display: flex;
-  align-items: center;
-  width: max-content;
-  height: max-content;
-  justify-content: center;
-  padding: 4px 8px;
-  border-radius: 10px;
-  background-color: #e8f0fe;
-  border: 1px solid #dadce0;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  color: #202124;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  box-shadow: 0 1px 3px rgba(60,64,67,0.08);
-  letter-spacing: 0.3px;
-  white-space: nowrap;
-}
-
-.mcp-main-button:hover {
-  background-color: #aecbfa;
-  box-shadow: 0 2px 4px rgba(60,64,67,0.12);
-}
-
-.mcp-main-button:active {
-  transform: translateY(1px);
-  box-shadow: 0 0 1px rgba(60,64,67,0.08);
-}
-
-.mcp-main-button.inactive {
-  background-color: #f5f7f9;
-  border-color: #dadce0;
-  color: #5f6368;
-}
-
-.mcp-popover {
-  width: 650px;
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(60,64,67,0.10), 0 2px 8px rgba(60,64,67,0.06);
-  padding: 0;
-  z-index: 1000;
-  border: 1px solid #dadce0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
-  overflow: visible;
-  max-height: 90vh;
-  position: relative;
-}
-
-.mcp-close-button {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  background: transparent;
-  border: none;
-  color: #5f6368;
-  font-size: 18px;
-  font-weight: 500;
-  z-index: 1002;
-  transition: all 0.2s ease;
-}
-
-.mcp-close-button:hover {
-  background-color: #e8f0fe;
-  color: #1a73e8;
-}
-
-.mcp-close-button:active {
-  transform: scale(0.95);
-}
-
-/* Default arrow (positioned at the bottom for popover above trigger) */
-.mcp-popover.position-above::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%) rotate(45deg);
-  width: 14px;
-  height: 14px;
-  background-color: #ffffff;
-  border-right: 1px solid #dadce0;
-  border-bottom: 1px solid #dadce0;
-}
-
-/* Arrow for popover positioned below the trigger */
-.mcp-popover.position-below::after {
-  content: '';
-  position: absolute;
-  top: -8px;
-  left: 50%;
-  transform: translateX(-50%) rotate(-135deg);
-  width: 14px;
-  height: 14px;
-  background-color: #ffffff;
-  border-right: 1px solid #dadce0;
-  border-bottom: 1px solid #dadce0;
-}
-
-.mcp-toggle-item {
-  display: block;
-  margin-bottom: 6px;
-  padding: 8px 10px;
-  cursor: pointer;
-  border-bottom: 1px solid #dadce0;
-  transition: background-color 0.15s ease;
-  box-sizing: border-box;
-  width: 100%;
-  background: #ffffff;
-}
-
-.mcp-toggle-item:hover {
-  background-color: #e8f0fe;
-}
-
-.mcp-toggle-item:last-child {
-  margin-bottom: 0;
-  border-bottom: none;
-}
-
-.mcp-toggle-checkbox {
-  position: relative;
-  width: 36px;
-  height: 18px;
-  flex-shrink: 0;
-  display: inline-block;
-  margin-right: 10px;
-  vertical-align: middle;
-  border-radius: 34px;
-  
-}
-
-.mcp-toggle-checkbox input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-  margin: 0;
-  padding: 0;
-}
-
-.mcp-toggle-slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #dadce0;
-  transition: .3s;
-  border-radius: 34px;
-  box-sizing: border-box;
-  overflow: hidden;
-}
-
-.mcp-toggle-slider:before {
-  position: absolute;
-  content: "";
-  height: 12px;
-  width: 12px;
-  left: 3px;
-  bottom: 3px;
-  background-color: #ffffff;
-  transition: .3s;
-  border-radius: 50%;
-  box-shadow: 0 1px 2px rgba(60,64,67,0.08);
-  z-index: 1;
-}
-
-input:checked + .mcp-toggle-slider {
-  background-color: #1a73e8;
-}
-
-input:checked + .mcp-toggle-slider:before {
-  transform: translateX(18px);
-}
-
-.mcp-toggle-label {
-  font-size: 13px;
-  color: #202124;
-  font-weight: 500;
-  letter-spacing: 0.2px;
-  white-space: nowrap;
-  vertical-align: middle;
-}
-
-.mcp-toggle-item.disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-  background-color: #f5f7f9;
-}
-
-.mcp-toggle-item.disabled .mcp-toggle-slider {
-  background-color: #dadce0;
-  cursor: not-allowed;
-  border-radius: 34px;
-  overflow: hidden;
-}
-
-.mcp-instruction-btn {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 8px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 2px rgba(60,64,67,0.05);
-}
-
-.mcp-instruction-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(60,64,67,0.10);
-}
-
-.mcp-instruction-btn:active {
-  transform: translateY(0);
-}
-
-.mcp-instructions-container {
-  background-color: #f8f9fa;
-  border: 1px solid #eaecef;
-  border-radius: 10px;
-  padding: 16px;
-  font-family: monospace;
-  font-size: 13px;
-  line-height: 1.5;
-  color: #3c4043;
-  box-shadow: inset 0 1px 2px rgba(60,64,67,0.03);
-  width: 100%;
-  box-sizing: border-box;
-  overflow-wrap: break-word;
-}
-
-.mcp-popover {
-  position: relative;
-}
-
-.mcp-drag-handle {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80px;
-  height: 6px;
-  cursor: move;
-  z-index: 1001;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  background-color: #dadce0;
-  border-bottom-left-radius: 3px;
-  border-bottom-right-radius: 3px;
-  border: none;
-}
-
-.mcp-drag-handle:hover {
-  background-color: #e8f0fe;
-}
-
-.mcp-drag-handle:hover .mcp-drag-handle-bar {
-  background-color: #1a73e8;
-}
-
-.mcp-drag-handle-bar {
-  width: 12px;
-  height: 3px;
-  background-color: #5f6368;
-  border-radius: 1.5px;
-  margin: 0 1px;
-  transition: background-color 0.2s ease;
-}
-
-@media (prefers-color-scheme: dark) {
-  .mcp-main-button {
-    background-color: #174ea6;
-    border-color: #8ab4f8;
-    color: #e8eaed;
-  }
-
-  .mcp-main-button:hover {
-    background-color: #8ab4f8;
-    color: #202124;
-  }
-
-  .mcp-main-button.inactive {
-    background-color: #2d2d2d;
-    border-color: #444;
-    color: #9aa0a6;
-  }
-
-  .mcp-popover {
-    background-color: #2d2d2d;
-    box-shadow: 0 4px 20px rgba(20,20,20,0.25), 0 2px 8px rgba(20,20,20,0.15);
-    border: 1px solid #444;
-    overflow: visible;
-  }
-
-  .mcp-popover.position-above::after,
-  .mcp-popover.position-below::after {
-    background-color: #2d2d2d;
-    border-right: 1px solid #444;
-    border-bottom: 1px solid #444;
-  }
-
-  .mcp-toggle-item {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    border-bottom: 1px solid #444;
-    background: #2d2d2d;
-  }
-
-  .mcp-toggle-item:hover {
-    background-color: #174ea6;
-  }
-
-  .mcp-toggle-slider {
-    background-color: #444;
-  }
-
-  input:checked + .mcp-toggle-slider {
-    background-color: #8ab4f8;
-  }
-
-  .mcp-toggle-label {
-    color: #e8eaed;
-  }
-
-  .mcp-toggle-item.disabled {
-    background-color: #282828;
-  }
-
-  .mcp-toggle-item.disabled .mcp-toggle-slider {
-    background-color: #444;
-    border-radius: 34px;
-    overflow: hidden;
-  }
-
-  .mcp-instructions-container {
-    background-color: #2d2d2d;
-    border: 1px solid #444;
-    color: #e8eaed;
-    box-shadow: inset 0 1px 2px rgba(20,20,20,0.10);
-  }
-
-  .mcp-close-button {
-    color: #9aa0a6;
-  }
-
-  .mcp-close-button:hover {
-    background-color: #174ea6;
-    color: #8ab4f8;
-  }
-  
-  .mcp-drag-handle {
-    background-color: #444;
-    border: none;
-  }
-
-  .mcp-drag-handle-bar {
-    background-color: #9aa0a6;
-  }
-  
-  .mcp-drag-handle:hover {
-    background-color: #174ea6;
-  }
-
-  .mcp-drag-handle:hover .mcp-drag-handle-bar {
-    background-color: #8ab4f8;
-  }
-}
-
-/* Hover overlay styles */
-.mcp-hover-overlay {
-  position: fixed !important;
-  background: #ffffff !important;
-  border: 1px solid #e1e5e9 !important;
-  border-radius: 10px !important;
-  box-shadow: 0 6px 20px rgba(60,64,67,0.12), 0 2px 8px rgba(60,64,67,0.06) !important;
-  padding: 8px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 4px !important;
-  align-items: stretch !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  transform: translateY(-8px) scale(0.95) !important;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  z-index: 2147483647 !important;
-  white-space: nowrap !important;
-  pointer-events: none !important;
-  width: 150px !important;
-  min-width: 150px !important;
-  max-width: 150px !important;
-  box-sizing: border-box !important;
-  font-family: inherit !important;
-  font-synthesis: none !important;
-  text-rendering: optimizeLegibility !important;
-  -webkit-font-smoothing: antialiased !important;
-  -moz-osx-font-smoothing: grayscale !important;
-}
-
-.mcp-hover-overlay.visible {
-  opacity: 1 !important;
-  visibility: visible !important;
-  transform: translateY(0) scale(1) !important;
-  pointer-events: auto !important;
-}
-
-.mcp-hover-button {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  gap: 8px !important;
-  padding: 10px 12px !important;
-  border-radius: 6px !important;
-  border: none !important;
-  background: #f8f9fa !important;
-  color: #374151 !important;
-  font-size: 13px !important;
-  font-weight: 500 !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  width: 100% !important;
-  min-width: 110px !important;
-  max-width: none !important;
-  box-sizing: border-box !important;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
-  text-align: left !important;
-  letter-spacing: -0.01em !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-}
-
-.mcp-hover-button:hover {
-  background: #e3f2fd !important;
-  color: #1565c0 !important;
-  transform: scale(1.02) !important;
-  box-shadow: 0 2px 8px rgba(21, 101, 192, 0.15) !important;
-}
-
-.mcp-hover-button:active {
-  transform: scale(0.98) !important;
-  box-shadow: 0 1px 3px rgba(21, 101, 192, 0.2) !important;
-}
-
-@media (prefers-color-scheme: dark) {
-  .mcp-hover-overlay {
-    background: #1f2937 !important;
-    border-color: #374151 !important;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.3), 0 3px 10px rgba(0,0,0,0.2) !important;
-  }
-
-  .mcp-hover-button {
-    background: #374151 !important;
-    color: #d1d5db !important;
-  }
-
-  .mcp-hover-button:hover {
-    background: #1e3a8a !important;
-    color: #93c5fd !important;
-    box-shadow: 0 2px 8px rgba(147, 197, 253, 0.2) !important;
-  }
-}
+[data-mcp-theme]{--mcp-bg:#fff;--mcp-surface:#f6f7f6;--mcp-ink:#1c2920;--mcp-muted:#58665c;--mcp-line:#dce3dd;--mcp-accent:#197137;--mcp-soft:#eaf7ed;color-scheme:light;font-family:Tahoma,"Segoe UI",sans-serif}
+[data-mcp-theme="dark"]{--mcp-bg:#0b100c;--mcp-surface:#131c15;--mcp-ink:#edf9ed;--mcp-muted:#a5b7a7;--mcp-line:#2b3c2d;--mcp-accent:#39ff14;--mcp-soft:#19321b;color-scheme:dark}
+.mcp-popover-container{position:relative;display:inline-block}
+.mcp-main-button{display:flex;align-items:center;justify-content:center;gap:5px;width:max-content;padding:7px 11px;border-radius:10px;background:var(--mcp-bg);border:1px solid var(--mcp-accent);color:var(--mcp-accent);cursor:pointer;font:600 14px/1.5 Tahoma,sans-serif;white-space:nowrap;box-shadow:0 2px 8px #0001}
+.mcp-main-button:hover{background:var(--mcp-soft)}
+.mcp-popover-container[data-mcp-theme]>div>button{background:var(--mcp-bg)!important;color:var(--mcp-accent)!important;border-color:var(--mcp-line)!important}
+.mcp-popover-container[data-mcp-theme]>div>button:hover{background:var(--mcp-soft)!important}
+.mcp-main-button.inactive{border-color:var(--mcp-line);color:var(--mcp-muted)}
+.mcp-popover{position:relative;max-height:calc(100vh - 24px);font:13px/1.8 Tahoma,sans-serif;color:var(--mcp-ink);box-sizing:border-box}
+.mcp-popover *,.mcp-hover-overlay *{box-sizing:border-box}
+.mcp-close-button{position:absolute;top:8px;left:8px;width:28px;height:28px;border:0;border-radius:50%;background:transparent;cursor:pointer;z-index:2;font-size:16px}
+.mcp-close-button:hover{background:var(--mcp-soft)}
+.mcp-toggle-item{display:block;margin-bottom:6px;padding:8px 0;box-sizing:border-box;width:100%}
+.mcp-toggle-item.disabled{opacity:.5}
+.mcp-toggle-checkbox{position:relative;width:36px;height:18px;flex-shrink:0;display:inline-block;vertical-align:middle}
+.mcp-toggle-checkbox input{opacity:0;width:0;height:0;margin:0;padding:0}
+.mcp-toggle-slider{position:absolute;inset:0;border-radius:34px;cursor:pointer;background:var(--mcp-line);transition:background .15s}
+.mcp-toggle-slider:before{position:absolute;content:"";height:12px;width:12px;left:3px;bottom:3px;background:#fff;border-radius:50%;box-shadow:0 1px 3px #0004;transition:transform .15s}
+.mcp-toggle-checkbox input:checked+.mcp-toggle-slider{background:var(--mcp-accent)}
+.mcp-toggle-checkbox input:checked+.mcp-toggle-slider:before{transform:translateX(18px)}
+.mcp-toggle-checkbox input:focus-visible+.mcp-toggle-slider{outline:2px solid var(--mcp-accent);outline-offset:3px}
+.mcp-toggle-checkbox input:disabled+.mcp-toggle-slider{cursor:not-allowed}
+.mcp-toggle-label{font-size:12px;white-space:nowrap;color:var(--mcp-ink)}
+.mcp-instruction-btn{display:flex;justify-content:center;align-items:center;padding:8px;border:1px solid var(--mcp-line);border-radius:8px;font:12px/1.7 Tahoma,sans-serif;background:var(--mcp-surface);color:var(--mcp-ink);cursor:pointer}
+.mcp-instruction-btn:hover{border-color:var(--mcp-accent);background:var(--mcp-soft)}
+.mcp-instruction-btn:disabled,.mcp-hover-button:disabled{opacity:.45;cursor:not-allowed}
+.mcp-instructions-container{padding:14px;border-radius:8px;font:12px/1.7 ui-monospace,monospace;overflow-wrap:anywhere;text-align:left}
+.mcp-hover-overlay{position:fixed!important;background:var(--mcp-bg)!important;color:var(--mcp-ink)!important;border:1px solid var(--mcp-line)!important;border-radius:10px;padding:7px;display:flex;flex-direction:column;gap:4px;box-shadow:0 8px 24px #0003;opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .15s,transform .15s;z-index:2147483647;width:180px;direction:rtl}
+.mcp-hover-overlay.visible{opacity:1;visibility:visible;transform:translateY(0)}
+.mcp-hover-button{display:flex;align-items:center;gap:8px;padding:10px;border:0;border-radius:6px;background:var(--mcp-surface);color:var(--mcp-ink);font:12px/1.7 Tahoma,sans-serif;cursor:pointer;text-align:right}
+.mcp-hover-button:hover{background:var(--mcp-soft);color:var(--mcp-accent)}
+.mcp-popover button:focus-visible,.mcp-main-button:focus-visible,.mcp-hover-button:focus-visible{outline:2px solid var(--mcp-accent);outline-offset:2px}
+.mcp-drag-handle{position:absolute;top:0;left:calc(50% - 24px);width:48px;height:6px;border-radius:0 0 5px 5px;background:#7b8a7d;cursor:move}
+@media(max-width:560px){.mcp-popover{flex-direction:column!important;overflow-y:auto!important}.mcp-popover>div{width:100%!important;flex-shrink:0}.mcp-popover>div:first-of-type{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));padding:35px 15px 8px!important}.mcp-instructions-container{max-height:180px!important}}
+@media(prefers-reduced-motion:reduce){.mcp-popover *,.mcp-hover-overlay *,.mcp-main-button{transition:none!important}}
 `;
 function useInjectStyles() {
   useEffect(() => {
@@ -567,13 +125,13 @@ const ToggleItem: React.FC<ToggleItemProps> = ({ id, label, checked, disabled, o
 
   // Color scheme for toggles
   const toggleTheme = {
-    itemBackground: isDarkMode ? '#2d2d2d' : '#ffffff',
-    itemBackgroundHover: isDarkMode ? '#174ea6' : '#e8f0fe',
-    itemBorderColor: isDarkMode ? '#444' : '#dadce0',
-    labelColor: isDarkMode ? '#e8eaed' : '#202124',
-    toggleBackground: isDarkMode ? '#444' : '#dadce0',
-    toggleBackgroundChecked: isDarkMode ? '#8ab4f8' : '#1a73e8',
-    toggleBackgroundDisabled: isDarkMode ? '#444' : '#dadce0',
+    itemBackground: isDarkMode ? '#0b100c' : '#ffffff',
+    itemBackgroundHover: isDarkMode ? '#19321b' : '#eaf7ed',
+    itemBorderColor: isDarkMode ? '#2b3c2d' : '#dce3dd',
+    labelColor: isDarkMode ? '#edf9ed' : '#1c2920',
+    toggleBackground: isDarkMode ? '#2b3c2d' : '#dce3dd',
+    toggleBackgroundChecked: isDarkMode ? '#39ff14' : '#197137',
+    toggleBackgroundDisabled: isDarkMode ? '#2b3c2d' : '#dce3dd',
   };
 
   return (
@@ -647,35 +205,26 @@ export const MCPPopover: React.FC<MCPPopoverProps> = ({ toggleStateManager, adap
     });
   }, [isAdapterActive, activePlugin, insertText, attachFile, adapterName, adapterButtonConfig]);
 
-  // Debug: Log instructions state for debugging
-  useEffect(() => {
-    logger.debug(`Instructions state:`, {
-      hasInstructions: !!instructionsState.instructions,
-      instructionsLength: instructionsState.instructions.length,
-      preferences: preferences
-    });
-  }, [instructionsState.instructions, preferences]);
-
   // Color scheme for the popover
   const theme = {
     // Background colors
-    mainBackground: isDarkMode ? '#2d2d2d' : '#ffffff',
-    secondaryBackground: isDarkMode ? '#2d2d2d' : '#f8f9fa',
-    buttonBackground: isDarkMode ? '#174ea6' : '#e8f0fe',
-    buttonBackgroundHover: isDarkMode ? '#8ab4f8' : '#aecbfa',
-    buttonBackgroundActive: isDarkMode ? '#8ab4f8' : '#1a73e8',
-    toggleBackground: isDarkMode ? '#444' : '#dadce0',
-    toggleBackgroundChecked: isDarkMode ? '#8ab4f8' : '#1a73e8',
-    toggleBackgroundDisabled: isDarkMode ? '#444' : '#dadce0',
+    mainBackground: isDarkMode ? '#0b100c' : '#ffffff',
+    secondaryBackground: isDarkMode ? '#0b100c' : '#f8f9fa',
+    buttonBackground: isDarkMode ? '#19321b' : '#eaf7ed',
+    buttonBackgroundHover: isDarkMode ? '#39ff14' : '#d4efda',
+    buttonBackgroundActive: isDarkMode ? '#39ff14' : '#197137',
+    toggleBackground: isDarkMode ? '#2b3c2d' : '#dce3dd',
+    toggleBackgroundChecked: isDarkMode ? '#39ff14' : '#197137',
+    toggleBackgroundDisabled: isDarkMode ? '#2b3c2d' : '#dce3dd',
 
     // Text colors
-    primaryText: isDarkMode ? '#e8eaed' : '#202124',
-    secondaryText: isDarkMode ? '#9aa0a6' : '#5f6368',
-    disabledText: isDarkMode ? '#9aa0a6' : '#5f6368',
+    primaryText: isDarkMode ? '#edf9ed' : '#1c2920',
+    secondaryText: isDarkMode ? '#a5b7a7' : '#58665c',
+    disabledText: isDarkMode ? '#a5b7a7' : '#58665c',
 
     // Border colors
-    borderColor: isDarkMode ? '#444' : '#dadce0',
-    dividerColor: isDarkMode ? '#444' : '#dadce0',
+    borderColor: isDarkMode ? '#2b3c2d' : '#dce3dd',
+    dividerColor: isDarkMode ? '#2b3c2d' : '#dce3dd',
 
     // Shadow
     boxShadow: isDarkMode
@@ -692,8 +241,7 @@ export const MCPPopover: React.FC<MCPPopoverProps> = ({ toggleStateManager, adap
       mcpEnabled: mcpEnabledFromStore // Use the persistent MCP state from store
     };
   });
-  // Instructions come directly from the global state (managed by Instructions panel in sidebar)
-  const [instructions, setInstructions] = useState(instructionsState.instructions || '');
+  const { instructions, toolCount, enabledCount } = useDefaultInstructions();
   const [copyStatus, setCopyStatus] = useState<'Copy' | 'Copied!' | 'Error'>('Copy');
   const [insertStatus, setInsertStatus] = useState<'Insert' | 'Inserted!' | 'No Adapter' | 'No Content' | 'Failed'>('Insert');
   const [attachStatus, setAttachStatus] = useState<'Attach' | 'Attached!' | 'No File' |'Not Supported'| 'Error'>('Attach');
@@ -727,22 +275,6 @@ export const MCPPopover: React.FC<MCPPopoverProps> = ({ toggleStateManager, adap
       return newState;
     });
   }, [mcpEnabledFromStore]);
-
-  // Subscribe to global instructions state changes (Instructions panel is source of truth)
-  useEffect(() => {
-    // Initial sync
-    setInstructions(instructionsState.instructions || '');
-    
-    // Subscribe to changes in the global instructions state
-    const unsubscribe = instructionsState.subscribe(newInstructions => {
-      setInstructions(newInstructions);
-    });
-
-    // Clean up subscription on unmount
-    return () => {
-      unsubscribe();
-    };
-  }, []);
 
   // Initialize and sync popover state with persistent MCP state from store
   useEffect(() => {
@@ -1015,7 +547,7 @@ export const MCPPopover: React.FC<MCPPopoverProps> = ({ toggleStateManager, adap
   const updateHoverOverlayPosition = useCallback(() => {
     if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
-      const overlayWidth = 150; // fixed width from CSS (updated for 4 buttons)
+      const overlayWidth = 180;
       const overlayHeight = 180; // approximate height for 4 buttons
 
       // Calculate position above the button
@@ -1155,7 +687,7 @@ export const MCPPopover: React.FC<MCPPopoverProps> = ({ toggleStateManager, adap
   );
 
   return (
-    <div className="mcp-popover-container" id="mcp-popover-container" ref={containerRef}>
+    <div className="mcp-popover-container" id="mcp-popover-container" data-mcp-theme={isDarkMode ? 'dark' : 'light'} ref={containerRef}>
       <div 
         style={{ position: 'relative', display: 'inline-block' }}
         onMouseEnter={handleMouseEnter}
@@ -1163,8 +695,9 @@ export const MCPPopover: React.FC<MCPPopoverProps> = ({ toggleStateManager, adap
       >
         <button
           className={buttonClassName}
-          aria-label={`MCP Settings - ${state.mcpEnabled ? 'Active' : 'Inactive'}`}
-          title={`MCP Settings - ${state.mcpEnabled ? 'Sidebar Visible' : 'Sidebar Hidden'}`}
+          aria-label={`تنظیمات MCP — ${state.mcpEnabled ? 'فعال' : 'غیرفعال'}`}
+          aria-expanded={isPopoverOpen}
+          title={`تنظیمات MCP — ${state.mcpEnabled ? 'پنل باز است' : 'پنل بسته است'}`}
           type="button"
           ref={buttonRef}
           onClick={() => setIsPopoverOpen(!isPopoverOpen)}>
@@ -1173,9 +706,9 @@ export const MCPPopover: React.FC<MCPPopoverProps> = ({ toggleStateManager, adap
       </div>
       
       {/* Hover overlay portal */}
-      {isHoverOverlayVisible && createPortal(
+      {isHoverOverlayVisible && !isPopoverOpen && createPortal(
         <div 
-          className={`mcp-hover-overlay ${isHoverOverlayVisible ? 'visible' : ''}`}
+          className={`mcp-hover-overlay ${isHoverOverlayVisible ? 'visible' : ''}`} data-mcp-theme={isDarkMode ? 'dark' : 'light'}
           ref={hoverOverlayRef}
           onMouseEnter={handleHoverOverlayEnter}
           onMouseLeave={handleHoverOverlayLeave}
@@ -1187,29 +720,31 @@ export const MCPPopover: React.FC<MCPPopoverProps> = ({ toggleStateManager, adap
           <button
             className="mcp-hover-button"
             onClick={handleInsert}
-            title="Insert instructions"
+            disabled={!instructions}
+            title="درج راهنمای ابزارها"
             type="button"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
               <path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
             </svg>
-            Insert
+            درج راهنما
           </button>
           <button
             className="mcp-hover-button"
             onClick={handleAttach}
-            title="Attach instructions as file"
+            disabled={!instructions || !activePlugin?.capabilities?.includes('file-attachment')}
+            title="پیوست راهنما به‌صورت فایل"
             type="button"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
               <path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/>
             </svg>
-            Attach
+            پیوست راهنما
           </button>
           <button
             className="mcp-hover-button"
             onClick={handleToggleSidebar}
-            title={isSidebarVisible ? "Hide sidebar" : "Show sidebar"}
+            title={isSidebarVisible ? "بستن پنل" : "بازکردن پنل"}
             type="button"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
@@ -1221,32 +756,32 @@ export const MCPPopover: React.FC<MCPPopoverProps> = ({ toggleStateManager, adap
                 <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
               )}
             </svg>
-            {isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
+            {isSidebarVisible ? 'بستن پنل' : 'بازکردن پنل'}
           </button>
           <button
             className="mcp-hover-button"
             onClick={() => setIsPopoverOpen(!isPopoverOpen)}
-            title="Configure MCP settings"
+            title="تنظیمات MCP"
             type="button"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
               <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.82,11.69,4.82,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
             </svg>
-            Configure
+            تنظیمات
           </button>
         </div>,
         document.body
       )}
       <PopoverPortal isOpen={isPopoverOpen} triggerRef={buttonRef}>
         <div
-          className="mcp-popover position-above"
+          className="mcp-popover position-above" dir="rtl" lang="fa" data-mcp-theme={isDarkMode ? 'dark' : 'light'} role="dialog" aria-label="راهنمای پیش‌فرض MCP"
           ref={popoverRef}
           style={{
             display: 'flex',
             flexDirection: 'row',
             minHeight: 280,
             padding: 0,
-            width: '650px',
+            width: 'min(650px, calc(100vw - 24px))',
             position: 'relative',
             borderRadius: '16px',
             boxShadow: theme.boxShadow,
@@ -1257,8 +792,8 @@ export const MCPPopover: React.FC<MCPPopoverProps> = ({ toggleStateManager, adap
           <button
             className="mcp-close-button"
             onClick={() => setIsPopoverOpen(false)}
-            aria-label="Close"
-            title="Close"
+            aria-label="بستن"
+            title="بستن"
             type="button"
             style={{
               color: theme.secondaryText,
@@ -1278,23 +813,24 @@ export const MCPPopover: React.FC<MCPPopoverProps> = ({ toggleStateManager, adap
               boxSizing: 'border-box',
             }}>
             <ToggleItem id="mcp-toggle" label="MCP" checked={state.mcpEnabled} disabled={false} onChange={handleMCP} />
+            <button className="mcp-instruction-btn" onClick={handleToggleSidebar} type="button">{isSidebarVisible ? 'بستن پنل ابزارها' : 'بازکردن پنل ابزارها'}</button>
             <ToggleItem
               id="auto-insert-toggle"
-              label="Auto Insert"
+              label="درج خودکار"
               checked={state.autoInsert}
               disabled={autoInsertDisabled}
               onChange={handleAutoInsert}
             />
             <ToggleItem
               id="auto-submit-toggle"
-              label="Auto Submit"
+              label="ارسال خودکار"
               checked={state.autoSubmit}
               disabled={autoSubmitDisabled}
               onChange={handleAutoSubmit}
             />
             <ToggleItem
               id="auto-execute-toggle"
-              label="Auto Execute"
+              label="اجرای خودکار"
               checked={state.autoExecute}
               disabled={autoExecuteDisabled}
               onChange={handleAutoExecute}
@@ -1321,10 +857,11 @@ export const MCPPopover: React.FC<MCPPopoverProps> = ({ toggleStateManager, adap
                 paddingBottom: 4,
                 borderBottom: `1px solid ${theme.dividerColor}`,
               }}>
-              Instructions
+              پرامپت پیش‌فرض ابزارها
+              <small style={{ display: 'block', fontSize: 11, marginTop: 8, color: theme.secondaryText }}>{enabledCount} از {toolCount} ابزار فعال</small>
             </div>
             <div
-              className="mcp-instructions-container"
+              className="mcp-instructions-container" dir="ltr"
               style={{
                 flex: 1,
                 minHeight: 180,
@@ -1347,10 +884,7 @@ export const MCPPopover: React.FC<MCPPopoverProps> = ({ toggleStateManager, adap
                   padding: '10px',
                   textAlign: 'center' 
                 }}>
-                  {!instructionsState.instructions 
-                    ? 'Loading instructions...' 
-                    : 'Generating instructions...'
-                  }
+                  {toolCount === 0 ? 'فهرست ابزارها دریافت نشده است. پنل ابزارها را باز کنید و اتصال سرور را تازه‌سازی کنید.' : 'همهٔ ابزارها غیرفعال‌اند. از پنل ابزارها، ابزارهای موردنیاز را فعال کنید.'}
                 </div>
               )}
             </div>
@@ -1378,10 +912,11 @@ export const MCPPopover: React.FC<MCPPopoverProps> = ({ toggleStateManager, adap
                   color: theme.primaryText,
                 }}
                 onClick={handleCopy}
+                disabled={!instructions}
                 onMouseEnter={e => (e.currentTarget.style.background = theme.buttonBackground)}
                 onMouseLeave={e => (e.currentTarget.style.background = theme.secondaryBackground)}
                 type="button">
-                {copyStatus}
+                {{ Copy: 'کپی', 'Copied!': 'کپی شد', Error: 'خطا' }[copyStatus]}
               </button>
               <button
                 className="mcp-instruction-btn"
@@ -1397,10 +932,11 @@ export const MCPPopover: React.FC<MCPPopoverProps> = ({ toggleStateManager, adap
                   color: theme.primaryText,
                 }}
                 onClick={handleInsert}
+                disabled={!instructions}
                 onMouseEnter={e => (e.currentTarget.style.background = theme.buttonBackground)}
                 onMouseLeave={e => (e.currentTarget.style.background = theme.secondaryBackground)}
                 type="button">
-                {insertStatus}
+                {{ Insert: 'درج راهنما', 'Inserted!': 'درج شد', 'No Adapter': 'صفحه شناسایی نشد', 'No Content': 'راهنما آماده نیست', Failed: 'درج انجام نشد' }[insertStatus]}
               </button>
               <button
                 className="mcp-instruction-btn"
@@ -1416,10 +952,11 @@ export const MCPPopover: React.FC<MCPPopoverProps> = ({ toggleStateManager, adap
                   color: theme.primaryText,
                 }}
                 onClick={handleAttach}
+                disabled={!instructions || !activePlugin?.capabilities?.includes('file-attachment')}
                 onMouseEnter={e => (e.currentTarget.style.background = theme.buttonBackground)}
                 onMouseLeave={e => (e.currentTarget.style.background = theme.secondaryBackground)}
                 type="button">
-                {attachStatus}
+                {{ Attach: 'پیوست راهنما', 'Attached!': 'پیوست شد', 'No File': 'فایلی آماده نیست', 'Not Supported': 'پشتیبانی نمی‌شود', Error: 'خطا' }[attachStatus]}
               </button>
             </div>
           </div>

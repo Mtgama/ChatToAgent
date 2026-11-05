@@ -82,6 +82,7 @@ websocket doc.md
 chrome-extension/public/icon-16.png
 chrome-extension/public/icon-34 copy.png
 chrome-extension/public/icon-34.png
+!chrome-extension/public/icon-34.png
 chrome-extension/src/mcpclient/architecture-option-3-plugin-based.md
 pages/content/src/plugins/adapters/gemini-migration-guide.md
 pages/content/src/plugins/adapters/scira.adapter.ts
@@ -91,3 +92,10 @@ pages/content/src/utils/migration-bridge.ts
 pages/content/src/utils/siteAdapter.ts
 pages/content/src/utils/themeDetector.ts
 clients.md
+.local-tools/
+
+# Local migration artifacts and private runtime data
+mcp-superassistant-local-fix.patch
+**/pairing-token
+**/memory.jsonl
+companion/data/

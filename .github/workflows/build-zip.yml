@@ -1,27 +1,26 @@
-name: Build And Upload Extension Zip Via Artifact
-
+name: Build extension
 on:
   push:
-    branches: [ main, dev ]
+    branches: [main, dev]
   pull_request:
-
+permissions:
+  contents: read
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
+          node-version: '24'
           cache: pnpm
-
-      - run: pnpm install --frozen-lockfile --prefer-offline
-
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter chrome-extension --filter @extension/content-script type-check
       - run: pnpm build
-
       - uses: actions/upload-artifact@v4
         with:
-          path: dist/*
+          name: ChatToAgent-Chrome
+          path: dist/
+          include-hidden-files: true
+          if-no-files-found: error

@@ -1174,6 +1174,8 @@ if (typeof window !== 'undefined') {
  * Main function to render a function call block
  */
 export const renderFunctionCall = (block: HTMLPreElement, isProcessingRef: { current: boolean }): boolean => {
+  // Respect site/author scoping even when a streaming observer calls us directly.
+  if (!CONFIG.targetSelectors.some(selector => block.matches(selector))) return false;
   injectStreamingStyles();
 
   const functionInfo = containsFunctionCalls(block);

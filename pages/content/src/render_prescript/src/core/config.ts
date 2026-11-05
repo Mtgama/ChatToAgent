@@ -5,6 +5,7 @@ import type { FunctionCallRendererConfig } from './types';
  */
 export const DEFAULT_CONFIG: FunctionCallRendererConfig = {
   knownLanguages: [
+    'jsonl',
     'xml',
     'html',
     'python',
@@ -122,9 +123,17 @@ export const WEBSITE_CONFIGS: Array<{
     {
       urlPattern: 'chatgpt.com',
       config: {
-        targetSelectors: ['pre'],
-        streamingContainerSelectors: ['pre'],
+        targetSelectors: ['[data-dil-message-id] [data-code-block-source]', '[data-message-author-role="assistant"] pre'],
+        streamingContainerSelectors: ['[data-dil-message-id] [data-code-block-source]', '[data-message-author-role="assistant"] pre'],
         function_result_selector: ['div[data-message-author-role="user"]'],
+      },
+    },
+    {
+      urlPattern: /^https:\/\/(?:www\.)?gapgpt\.app\//,
+      config: {
+        targetSelectors: ['.bot-message pre'],
+        streamingContainerSelectors: ['.bot-message pre'],
+        function_result_selector: ['.message-container .bg-user'],
       },
     },
     {

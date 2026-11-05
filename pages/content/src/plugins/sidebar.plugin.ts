@@ -258,6 +258,7 @@ export class SidebarPlugin implements AdapterPlugin {
   private determineSiteType(hostname: string): SiteType {
     // Map hostnames to site types (same logic as legacy adapters)
     if (hostname.includes('perplexity.ai')) return 'perplexity';
+    if (hostname === 'gapgpt.app' || hostname === 'www.gapgpt.app') return 'gapgpt';
     if (hostname.includes('chatgpt.com') || hostname.includes('chat.openai.com')) return 'chatgpt';
     if (hostname.includes('x.ai') || hostname.includes('grok')) return 'grok';
     if (hostname.includes('gemini.google.com')) return 'gemini';

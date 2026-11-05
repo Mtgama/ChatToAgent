@@ -16,6 +16,7 @@ import '@src/components/sidebar/styles/sidebar.css';
 export type SiteType =
   | 'perplexity'
   | 'chatgpt'
+  | 'gapgpt'
   | 'grok'
   | 'zai'
   | 'gemini'

@@ -50,7 +50,7 @@ const initialUserPreferences: UserPreferences = {
   autoExecute: false,  // New automation field
   notifications: true,
   theme: 'system', // Default theme
-  language: navigator.language || 'en-US',
+  language: 'fa-IR',
   isPushMode: false,
   sidebarWidth: 320,
   isMinimized: false,

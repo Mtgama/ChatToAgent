@@ -1,13 +1,13 @@
 {
-  "name": "mcp-superassistant",
-  "version": "0.6.0",
-  "description": "MCP SuperAssistant",
+  "name": "chat-to-agent",
+  "version": "0.7.1",
+  "description": "ChatToAgent — Persian-first browser MCP tools and a local management companion",
   "license": "MIT",
   "private": true,
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/srbhptl39/MCP-SuperAssistant.git"
+    "url": "https://github.com/Mtgama/ChatToAgent.git"
   },
   "type": "module",
   "scripts": {
@@ -36,12 +36,15 @@
     "copy_env": "bash bash-scripts/copy_env.sh",
     "set-global-env": "bash bash-scripts/set_global_env.sh",
     "postinstall": "pnpm build:eslint && pnpm copy_env",
-    "module-manager": "pnpm -F module-manager start"
+    "module-manager": "pnpm -F module-manager start",
+    "test:extension": "node tests/site-compatibility.mjs && node tests/companion-extension.mjs && node tests/popover-regression.mjs",
+    "test:companion": "node --test companion/tests/*.test.mjs",
+    "test": "pnpm test:extension && pnpm test:companion"
   },
   "dependencies": {
+    "firebase": "^11.9.1",
     "react": "19.1.0",
-    "react-dom": "19.0.0",
-    "firebase": "^11.9.1"
+    "react-dom": "19.0.0"
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.5",
@@ -72,6 +75,7 @@
     "fast-glob": "^3.3.3",
     "globals": "^16.3.0",
     "husky": "^9.1.4",
+    "linkedom": "^0.18.15",
     "lint-staged": "^15.2.7",
     "postcss": "^8.5.2",
     "postcss-load-config": "^6.0.1",

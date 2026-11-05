@@ -4,7 +4,7 @@ import { CONFIG } from '../core/config';
 import { safelySetContent } from '../utils/index';
 import { storeExecutedFunction, generateContentSignature } from '../mcpexecute/storage';
 import { checkAndDisplayFunctionHistory, createHistoryPanel, updateHistoryPanel } from './functionHistory';
-import { extractJSONParameters, stripLanguageTags, extractCleanContent } from '../parser/jsonFunctionParser';
+import { extractJSONObjects, extractJSONParameters, stripLanguageTags, extractCleanContent } from '../parser/jsonFunctionParser';
 import { createLogger } from '@extension/shared/lib/logger';
 
 // Add type declarations for the global adapter and mcpClient access
@@ -242,7 +242,7 @@ export const addRawXmlToggle = (blockDiv: HTMLDivElement, rawContent: string): v
   // Create toggle button with optimized element creation
   const toggleBtn = createOptimizedElement('button', {
     className: 'raw-toggle',
-    innerHTML: `${ICONS.CODE}<span>Show Raw Info</span>`,
+    innerHTML: `${ICONS.CODE}<span>نمایش کد درخواست</span>`,
     styles: {
       display: 'flex',
       alignItems: 'center',
@@ -262,7 +262,7 @@ export const addRawXmlToggle = (blockDiv: HTMLDivElement, rawContent: string): v
     // Use requestAnimationFrame for smooth visual updates
     requestAnimationFrame(() => {
       rawXmlContainer.style.display = isVisible ? 'block' : 'none';
-      textSpan.textContent = isVisible ? 'Hide Raw Info' : 'Show Raw Info';
+      textSpan.textContent = isVisible ? 'پنهان‌کردن کد' : 'نمایش کد درخواست';
     });
   };
 
@@ -587,6 +587,12 @@ export const addExecuteButton = (blockDiv: HTMLDivElement, rawContent: string): 
 
   // Detect format and extract function name and parameters
   const isJSON = rawContent.includes('"type"') && rawContent.includes('function_call');
+  // Site code headers can concatenate labels such as "content_copy jsonl"
+  // with the first JSON line. Use the parser's bracket-aware extraction for
+  // both the function name and call ID, as we already do for parameters.
+  if (isJSON) {
+    rawContent = extractJSONObjects(rawContent).map(object => JSON.stringify(JSON.parse(object))).join('\n');
+  }
   const functionName = extractFunctionName(rawContent);
 
   let parameters: Record<string, any>;
@@ -652,7 +658,7 @@ export const addExecuteButton = (blockDiv: HTMLDivElement, rawContent: string): 
   // Create optimized execute button
   const executeButton = createOptimizedElement('button', {
     className: 'execute-button',
-    innerHTML: `${ICONS.PLAY}<span>Run</span>`,
+    innerHTML: `${ICONS.PLAY}<span>اجرا</span>`,
     styles: {
       display: 'flex',
       alignItems: 'center',
@@ -731,7 +737,7 @@ export const addExecuteButton = (blockDiv: HTMLDivElement, rawContent: string): 
 
       if (!mcpClient) {
         resetButtonState();
-        displayResult(resultsPanel, loadingIndicator, false, 'Error: mcpClient not found');
+        displayResult(resultsPanel, loadingIndicator, false, 'سرویس افزونه آماده نیست؛ صفحه را تازه‌سازی کنید.');
         resultsPanel.style.display = 'block';
         return;
       }
@@ -739,7 +745,7 @@ export const addExecuteButton = (blockDiv: HTMLDivElement, rawContent: string): 
       // Check if mcpClient is ready
       if (!mcpClient.isReady || !mcpClient.isReady()) {
         resetButtonState();
-        displayResult(resultsPanel, loadingIndicator, false, 'Error: MCP client not ready');
+        displayResult(resultsPanel, loadingIndicator, false, 'اتصال MCP آماده نیست؛ وضعیت سرویس را بررسی کنید.');
         resultsPanel.style.display = 'block';
         return;
       }
@@ -949,7 +955,7 @@ const attachResultAsFile = async (
 
     const handleUnsupported = () => {
       const originalText = button.classList.contains('insert-result-button') ? 'Insert' : 'Attach File';
-      button.innerHTML = `${ICONS.ATTACH}<span>No Adapter</span>`;
+      button.innerHTML = `${ICONS.ATTACH}<span>صفحه شناسایی نشد</span>`;
       button.classList.add('attach-error');
 
       setTimeout(() => {
@@ -968,7 +974,7 @@ const attachResultAsFile = async (
 
     const handleUnsupported = () => {
       const originalText = button.classList.contains('insert-result-button') ? 'Insert' : 'Attach File';
-      button.innerHTML = `${ICONS.ATTACH}<span>Attach Not Supported</span>`;
+      button.innerHTML = `${ICONS.ATTACH}<span>پیوست پشتیبانی نمی‌شود</span>`;
       button.classList.add('attach-error');
 
       setTimeout(() => {
@@ -1016,7 +1022,7 @@ const attachResultAsFile = async (
   const resetButtonState = (delay: number = 2000) => {
     setTimeout(() => {
       // Reset to original button structure
-      button.innerHTML = `${ICONS.ATTACH}<span>Attach File</span>`;
+      button.innerHTML = `${ICONS.ATTACH}<span>پیوست فایل</span>`;
       button.classList.remove('attach-success', 'attach-error');
       button.disabled = false;
     }, delay);
@@ -1406,7 +1412,7 @@ export const displayResult = (
     // Create optimized insert button
     const insertButton = createOptimizedElement('button', {
       className: 'insert-result-button',
-      innerHTML: `${ICONS.INSERT}<span>Insert</span>`,
+      innerHTML: `${ICONS.INSERT}<span>درج نتیجه</span>`,
       styles: {
         display: 'flex',
         alignItems: 'center',
@@ -1427,10 +1433,10 @@ export const displayResult = (
 
       if (!adapter) {
         const setErrorState = () => {
-          insertButton.textContent = 'Failed (No Adapter)';
+          insertButton.textContent = 'صفحه شناسایی نشد';
           insertButton.classList.add('insert-error');
           setTimeout(() => {
-            insertButton.innerHTML = `${ICONS.INSERT}<span>Insert</span>`;
+            insertButton.innerHTML = `${ICONS.INSERT}<span>درج نتیجه</span>`;
             insertButton.classList.remove('insert-error');
           }, 2000);
         };
@@ -1443,10 +1449,10 @@ export const displayResult = (
       // Check if adapter supports text insertion
       if (!adapterSupportsCapability('text-insertion')) {
         const setErrorState = () => {
-          insertButton.textContent = 'Not Supported';
+          insertButton.textContent = 'پشتیبانی نمی‌شود';
           insertButton.classList.add('insert-error');
           setTimeout(() => {
-            insertButton.innerHTML = `${ICONS.INSERT}<span>Insert</span>`;
+            insertButton.innerHTML = `${ICONS.INSERT}<span>درج نتیجه</span>`;
             insertButton.classList.remove('insert-error');
           }, 2000);
         };
@@ -1478,12 +1484,12 @@ export const displayResult = (
 
             if (success) {
               // Optimized success state handling
-              insertButton.textContent = 'Inserted!';
+              insertButton.textContent = 'درج شد';
               insertButton.classList.add('insert-success');
               insertButton.disabled = true;
 
               setTimeout(() => {
-                insertButton.innerHTML = `${ICONS.INSERT}<span>Insert</span>`;
+                insertButton.innerHTML = `${ICONS.INSERT}<span>درج نتیجه</span>`;
                 insertButton.classList.remove('insert-success');
                 insertButton.disabled = false;
               }, 2000);
@@ -1526,23 +1532,23 @@ export const displayResult = (
               });
 
               // Optimized success state handling
-              insertButton.textContent = 'Inserted!';
+              insertButton.textContent = 'درج شد';
               insertButton.classList.add('insert-success');
               insertButton.disabled = true;
 
               setTimeout(() => {
-                insertButton.innerHTML = `${ICONS.INSERT}<span>Insert</span>`;
+                insertButton.innerHTML = `${ICONS.INSERT}<span>درج نتیجه</span>`;
                 insertButton.classList.remove('insert-success');
                 insertButton.disabled = false;
               }, 2000);
             } else {
               // Optimized error state
               logger.error('No valid insert method found on adapter');
-              insertButton.textContent = 'Failed (No Insert Method)';
+              insertButton.textContent = 'درج خودکار در این صفحه پشتیبانی نمی‌شود';
               insertButton.classList.add('insert-error');
 
               setTimeout(() => {
-                insertButton.innerHTML = `${ICONS.INSERT}<span>Insert</span>`;
+                insertButton.innerHTML = `${ICONS.INSERT}<span>درج نتیجه</span>`;
                 insertButton.classList.remove('insert-error');
               }, 2000);
             }
@@ -1566,23 +1572,23 @@ export const displayResult = (
           });
 
           // Optimized success state handling
-          insertButton.textContent = 'Inserted!';
+          insertButton.textContent = 'درج شد';
           insertButton.classList.add('insert-success');
           insertButton.disabled = true;
 
           setTimeout(() => {
-            insertButton.innerHTML = `${ICONS.INSERT}<span>Insert</span>`;
+            insertButton.innerHTML = `${ICONS.INSERT}<span>درج نتیجه</span>`;
             insertButton.classList.remove('insert-success');
             insertButton.disabled = false;
           }, 2000);
         } else {
           // Optimized error state
           logger.error('Adapter has no insert method available');
-          insertButton.textContent = 'Failed (No Insert Method)';
+          insertButton.textContent = 'درج خودکار در این صفحه پشتیبانی نمی‌شود';
           insertButton.classList.add('insert-error');
 
           setTimeout(() => {
-            insertButton.innerHTML = `${ICONS.INSERT}<span>Insert</span>`;
+            insertButton.innerHTML = `${ICONS.INSERT}<span>درج نتیجه</span>`;
             insertButton.classList.remove('insert-error');
           }, 2000);
         }
@@ -1592,7 +1598,7 @@ export const displayResult = (
     // Create attach button efficiently
     const attachButton = createOptimizedElement('button', {
       className: 'attach-file-button',
-      innerHTML: `${ICONS.ATTACH}<span>Attach File</span>`,
+      innerHTML: `${ICONS.ATTACH}<span>پیوست فایل</span>`,
       styles: {
         display: 'flex',
         alignItems: 'center',

@@ -18,15 +18,15 @@ export const styles = `
     --light-surface: #f1f3f4;
     --light-surface-secondary: #f5f7f9;
     --light-surface-tertiary: #f8f9fa;
-    --light-primary: #1a73e8;
-    --light-primary-hover: #1967d2;
-    --light-primary-surface: #e8f0fe;
+    --light-primary: #197137;
+    --light-primary-hover: #155c2d;
+    --light-primary-surface: #eaf7ed;
     --light-success: #34a853;
     --light-error: #ea4335;
     --light-warning: #fbbc04;
     
     /* Dark theme variables */
-    --dark-bg: #1e1e1e;
+    --dark-bg: #0b100c;
     --dark-text: #e8eaed;
     --dark-text-secondary: #9aa0a6;
     --dark-text-tertiary: #dadce0;
@@ -34,19 +34,19 @@ export const styles = `
     --dark-border-secondary: rgba(255,255,255,0.05);
     --dark-border-tertiary: rgba(255,255,255,0.12);
     --dark-shadow: 0 3px 12px rgba(0,0,0,0.25), 0 1px 4px rgba(0,0,0,0.15);
-    --dark-surface: #2d2d2d;
-    --dark-surface-secondary: #282828;
+    --dark-surface: #131c15;
+    --dark-surface-secondary: #101812;
     --dark-surface-tertiary: #1e1e1e;
-    --dark-primary: #8ab4f8;
-    --dark-primary-hover: #7ba9f0;
-    --dark-primary-surface: #174ea6;
+    --dark-primary: #39ff14;
+    --dark-primary-hover: #7bff62;
+    --dark-primary-surface: #19321b;
     --dark-success: #34a853;
     --dark-error: #f28b82;
     --dark-warning: #ffcb6b;
     
     /* Common variables */
     --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-    --font-system: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+    --font-system: Tahoma, 'Segoe UI', sans-serif;
     --border-radius: 8px;
     --border-radius-sm: 4px;
     --border-radius-lg: 10px;
