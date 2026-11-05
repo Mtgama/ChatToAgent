@@ -8,6 +8,10 @@ Persian-first Chrome extension and local control panel by **mehrdad hasanzade**,
 
 [English](#english) · [راهنمای فارسی](#فارسی) · [نسخهٔ مستقل فارسی](README.fa.md)
 
+[![Download Chrome extension v0.7.1](docs/assets/download-extension.svg)](https://github.com/Mtgama/ChatToAgent/releases/download/v0.7.1/ChatToAgent-Chrome-v0.7.1.zip)
+
+[All releases / همهٔ نسخه‌ها](https://github.com/Mtgama/ChatToAgent/releases)
+
 ## English
 
 ### What it does
@@ -46,6 +50,14 @@ Chrome toolbar popup → authenticated local manager → workspace, tools, start
 | Other operating systems | Manual companion startup is available; macOS/Windows installation and Firefox are not certified by this fork |
 
 ChatGPT and `gapgpt.app` have dedicated compatibility regressions. DeepSeek, Gemini, and Perplexity have been reported working by the user. Other adapters inherited from upstream are present, but their current website versions are not all verified. Website DOM changes can require adapter updates. GapGPT currently supports direct prompt insertion, not the file-attachment shortcut.
+
+### Download the ready-to-load extension
+
+**[⬇ Download ChatToAgent for Chrome — v0.7.1 ZIP](https://github.com/Mtgama/ChatToAgent/releases/download/v0.7.1/ChatToAgent-Chrome-v0.7.1.zip)** · [SHA-256 checksums](https://github.com/Mtgama/ChatToAgent/releases/download/v0.7.1/SHA256SUMS.txt)
+
+No Node.js or build tools are needed to load the downloaded extension. Extract the ZIP into a permanent folder, open `chrome://extensions`, enable **Developer mode**, choose **Load unpacked**, and select the extracted folder containing `manifest.json`. Keep that folder in place. Chrome does not install this ZIP directly; this release is an unpacked extension, not a Chrome Web Store package. For an existing installation, replace its extracted files and click **Reload**, then refresh chat tabs.
+
+The ZIP contains the browser extension only. The local MCP companion and tool packages are installed separately using the source-install steps below. For later versions, check [Releases](https://github.com/Mtgama/ChatToAgent/releases); existing installations do not auto-update from GitHub. For integrity checks on Linux, download both files into the same directory and run `sha256sum --check SHA256SUMS.txt`.
 
 ### Install from source
 
@@ -273,6 +285,14 @@ Personalization and local companion: **mehrdad hasanzade**. Original extension: 
 | سیستم‌های دیگر | اجرای دستی سرور ممکن است؛ نصب ویندوز، مک و Firefox در این نسخه تأیید نشده است |
 
 برای ChatGPT و `gapgpt.app` آزمون‌های اختصاصی سازگاری وجود دارد. کارکرد DeepSeek، Gemini و Perplexity توسط کاربر گزارش شده است. سایر آداپترهای نسخهٔ اصلی در سورس هستند، ولی همهٔ نسخه‌های فعلی سایت‌ها بررسی نشده‌اند. تغییر ساختار سایت می‌تواند نیازمند اصلاح آداپتر باشد. در GapGPT درج مستقیم پرامپت فعال است و میانبر پیوست فایل پشتیبانی نمی‌شود.
+
+### دانلود افزونهٔ آماده
+
+**[⬇ دانلود افزونهٔ ChatToAgent برای Chrome — نسخهٔ ۰.۷.۱](https://github.com/Mtgama/ChatToAgent/releases/download/v0.7.1/ChatToAgent-Chrome-v0.7.1.zip)** · [فایل بررسی صحت SHA-256](https://github.com/Mtgama/ChatToAgent/releases/download/v0.7.1/SHA256SUMS.txt)
+
+برای بارگذاری افزونهٔ آماده به Node.js یا ابزار ساخت نیاز ندارید. فایل ZIP را در یک پوشهٔ دائمی استخراج کنید، `chrome://extensions` را باز کنید، **Developer mode** را روشن کنید، **Load unpacked** را بزنید و پوشه‌ای را انتخاب کنید که فایل `manifest.json` داخل آن است. پوشه را جابه‌جا نکنید. این ZIP مستقیماً در Chrome نصب نمی‌شود و نسخهٔ فروشگاه Chrome نیست. برای به‌روزرسانی نصب موجود، فایل‌های استخراج‌شده را جایگزین، افزونه را Reload و تب‌های چت را Refresh کنید.
+
+فایل دانلود فقط افزونهٔ مرورگر است؛ مدیر محلی و بسته‌های ابزار MCP باید جداگانه طبق راهنمای نصب سورس زیر نصب شوند. نسخه‌های بعدی در [Releases](https://github.com/Mtgama/ChatToAgent/releases) قرار می‌گیرند و از GitHub خودکار به‌روزرسانی نمی‌شوند. برای بررسی صحت در لینوکس، ZIP و فایل SHA256SUMS.txt را در یک پوشه بگذارید و `sha256sum --check SHA256SUMS.txt` را اجرا کنید.
 
 ### نصب کامل از سورس
 

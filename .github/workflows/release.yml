@@ -1,0 +1,35 @@
+name: Publish Chrome extension
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: pnpm
+      - name: Verify release tag
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          test "$GITHUB_REF_NAME" = "v$VERSION"
+      - run: pnpm install --frozen-lockfile
+      - run: npm ci --prefix companion
+      - run: pnpm test:extension
+      - run: MCP_TEST_RUNTIME="$PWD/companion" pnpm test:companion
+      - run: pnpm --filter chrome-extension --filter @extension/content-script type-check
+      - run: pnpm build
+      - run: python3 scripts/package-extension.py
+      - name: Publish release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist-zip/ChatToAgent-Chrome-*.zip dist-zip/SHA256SUMS.txt \
+            --verify-tag --title "ChatToAgent $GITHUB_REF_NAME · Mehrdad MCP" \
+            --notes-file "docs/releases/$GITHUB_REF_NAME.md" --latest
